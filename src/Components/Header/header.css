@@ -1,0 +1,8 @@
+header{
+    justify-content: space-between;
+    padding: 0.4rem 5rem;
+    border-bottom: 1px solid gainsboro;
+    img{
+        height: 58px;
+    }
+}

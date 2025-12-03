@@ -1,68 +1,245 @@
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  color: #111827;
+  background-color: white;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  --color-primary: #d97706;
+  --color-primary-light: #ffbb6e;
+  --color-primary-light-50: #fef3e8;
+  --color-text: #111827;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-
-body {
+/* start---------------CSS resets---------------start */
+* {
   margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+  padding: 0;
+  /* outline: 1px solid red; */
+  font: inherit;
 }
 
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+li{
+  list-style: none;
+}
+
+/* end---------------CSS resets---------------end */
+
+section {
+  padding: 6rem 10rem;
+}
+
+.tag {
+  padding: 0.2rem 0.8rem;
+  background-color: var(--color-primary-light);
+  border-radius: 1.2rem;
+}
+
+/* ====================================COLOR==================================== */
+.white {
+  color: white
+}
+
+.color-primary {
+  color: var(--color-primary);
+}
+
+.center {
+  text-align: center;
+}
+
+/* ==============================TYPOGRAPHY============================== */
+/* H1 – 28 → 48 */
 h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+  font-size: clamp(28px, calc(28px + 2.2727vw), 48px);
+  line-height: 1.05;
 }
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
+/* H2 – 22 → 34 */
+h2 {
+  font-size: clamp(22px, calc(22px + 1.3636vw), 34px);
+  line-height: 1.12;
+}
+
+/* H3 – 18 → 26 */
+h3 {
+  font-size: clamp(18px, calc(18px + 0.9091vw), 26px);
+  line-height: 1.2;
+}
+
+/* H4 – 16 → 22 */
+h4 {
+  font-size: clamp(16px, calc(16px + 0.6818vw), 22px);
+  line-height: 1.27;
+}
+
+/* H5 – 15 → 18 */
+h5 {
+  font-size: clamp(15px, calc(15px + 0.3409vw), 18px);
+  line-height: 1.3;
+}
+
+/* H6 – 14 → 16 */
+h6 {
+  font-size: clamp(14px, calc(14px + 0.2273vw), 16px);
+  line-height: 1.35;
+}
+
+/* SMALL – 13 → 14 */
+small {
+  font-size: clamp(13px, calc(13px + 0.1136vw), 14px);
+  line-height: 1.4;
+}
+
+/* Optional max line width for reading */
+p,
+li {
+  max-width: 65ch;
+}
+
+.bold {
+  font-weight: 600;
+}
+
+.italic {
+  font-style: italic;
+}
+
+/* ===================================================================================== */
+/* ===========================BUTTON=========================== */
+button.primary {
+  padding: 0.4rem 2rem;
+  background-color: var(--color-primary);
+  border: none;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  border-radius: 0.3rem;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+button.secondary {
+  padding: 0.5rem 2rem;
+  background-color: transparent;
+  border: 2px solid var(--color-primary);
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  border-radius: 0.3rem;
 }
+
+.btn-container {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+/* ========================================================================== */
+/* =========================================CARD========================================= */
+.card {
+  padding: 3rem;
+  border: 1px solid var(--color-primary-light);
+  border-radius: 0.5rem;
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+}
+
+.svg-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background-color: var(--color-primary-light-50);
+  font-size: 2rem;
+  color: var(--color-primary);
+  border-radius: 50%;
+}
+
+/* ========================================FLEX======================================== */
+.flex {
+  display: flex;
+}
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.space-btw{
+  justify-content: space-between;
+}
+
+.align-center {
+  align-items: center;
+}
+
+.gap-05 {
+  gap: 0.5rem;
+}
+
+.gap-1 {
+  gap: 1rem;
+}
+
+.gap-2 {
+  gap: 2rem;
+}
+
+/* ============================================================================ */
+
+/* ===================================MARGIN=================================== */
+.mb-0 {
+  margin-bottom: 0;
+}
+
+.mb-05 {
+  margin-bottom: 0.5rem;
+}
+
+.mb-1 {
+  margin-bottom: 1rem;
+}
+
+.mb-2 {
+  margin-bottom: 2rem;
+}
+
+.mb-3 {
+  margin-bottom: 3rem;
+}
+
+.mt-0 {
+  margin-top: 0;
+}
+
+.mt-1 {
+  margin-top: 1rem;
+}
+
+.mt-2 {
+  margin-top: 2rem;
+}
+
+.mt-3 {
+  margin-top: 3rem;
+}
+
+
+/* ====================================================================== */

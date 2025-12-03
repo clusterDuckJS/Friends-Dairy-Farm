@@ -1,0 +1,19 @@
+footer {
+    padding: 5rem 5rem 1rem 5rem;
+    background-color: var(--color-primary-light-50);
+
+    .text-wrapper {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+
+        img {
+            max-width: 6rem;
+        }
+
+        .column-3 {
+            svg {
+                color: var(--color-primary);
+            }
+        }
+    }
+}
