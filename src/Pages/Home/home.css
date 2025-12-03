@@ -59,3 +59,30 @@
         }
     }
 }
+
+/*======== MEDIA QUERIES (MEDIUM DEVICES) ======== */
+@media screen and (max-width: 1024px) {
+    .main-container.home {
+        .hero {
+            flex-direction: column;
+            align-items: flex-start;
+            img{
+                width: 100%;
+            }
+        }
+
+
+        .products{
+            .card-container{
+                grid-template-columns: none;
+            }
+        }
+
+    }
+}
+
+
+/*======== MEDIA QUERIES (SMALL DEVICES) ======== */
+@media screen and (max-width: 768px) {
+
+}

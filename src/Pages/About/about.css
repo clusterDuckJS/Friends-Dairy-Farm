@@ -1,0 +1,30 @@
+.main-container.about {
+    .intro{
+        background-color: var(--color-primary-light-50);
+    }
+    .steps {
+        background-color: var(--color-primary-light-50);
+
+        .step-wrapper {
+
+            .svg-wrapper {
+                color: white;
+                background-color: var(--color-primary);
+                padding: 1rem 1.5rem;
+            }
+
+            .text-wrapper {
+                background-color: white;
+                padding: 1.5rem;
+                border-radius: 0.5rem;
+                /* box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px; */
+                box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
+                width: 100%;
+
+                p{
+                    max-width: 100%;
+                }
+            }
+        }
+    }
+}

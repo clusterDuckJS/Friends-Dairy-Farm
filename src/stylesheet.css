@@ -30,7 +30,8 @@
 *::after {
   box-sizing: border-box;
 }
-li{
+
+li {
   list-style: none;
 }
 
@@ -126,6 +127,7 @@ button.primary {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  white-space: nowrap;
   font-weight: 500;
   border-radius: 0.3rem;
 }
@@ -137,6 +139,7 @@ button.secondary {
   color: var(--color-primary);
   display: flex;
   align-items: center;
+  white-space: nowrap;
   gap: 0.5rem;
   font-weight: 500;
   border-radius: 0.3rem;
@@ -182,7 +185,7 @@ button.secondary {
   justify-content: center;
 }
 
-.space-btw{
+.space-btw {
   justify-content: space-between;
 }
 
@@ -243,3 +246,29 @@ button.secondary {
 
 
 /* ====================================================================== */
+
+
+/*======== MEDIA QUERIES (MEDIUM DEVICES) ======== */
+@media screen and (max-width: 1024px) {
+  section {
+    padding: 5rem 2rem;
+  }
+
+  .card-container {
+    flex-direction: column;
+  }
+}
+
+
+/*======== MEDIA QUERIES (SMALL DEVICES) ======== */
+@media screen and (max-width: 768px) {
+
+  section,
+  footer {
+    padding: 5rem 1rem;
+  }
+
+  .card {
+    max-width: 100%;
+  }
+}

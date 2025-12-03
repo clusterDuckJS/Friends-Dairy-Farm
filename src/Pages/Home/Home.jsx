@@ -9,11 +9,11 @@ import { GoStarFill } from 'react-icons/go'
 function Home() {
     return (
         <div className='main-container home'>
-            <section className="hero flex align-center">
+            <section className="hero flex align-center gap-2">
                 <div className="text-wrapper">
                     <small className='tag'>🌾 Farm Fresh & Pure</small>
                     <h1 className='bold mt-2'>Pure A2 Milk</h1>
-                    <h1 className='bold'>From Our Farm</h1>
+                    <h1 className='bold color-primary'>From Our Farm</h1>
                     <h1 className='bold mb-2'>To Your Home</h1>
                     <p className='mb-2'>Experience the goodness of traditional dairy farming. Fresh, pure A2 milk and handcrafted dairy products delivered daily to your doorstep in Chennai.</p>
                     <div className="btn-container">
