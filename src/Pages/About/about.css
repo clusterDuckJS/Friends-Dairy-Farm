@@ -2,6 +2,12 @@
     .intro{
         background-color: var(--color-primary-light-50);
     }
+    .hero{
+        img{
+            width: 35vw;
+            border-radius: 0.5rem;
+        }
+    }
     .steps {
         background-color: var(--color-primary-light-50);
 
@@ -27,4 +33,28 @@
             }
         }
     }
+
+
+}
+
+/*======== MEDIA QUERIES (MEDIUM DEVICES) ======== */
+@media screen and (max-width: 1024px) {
+.main-container.about {
+    .hero{
+        flex-direction: column;
+        img{
+            width: 100%;
+        }
+    }
+
+        .data{
+        flex-direction: column;
+    }
+}
+}
+
+
+/*======== MEDIA QUERIES (SMALL DEVICES) ======== */
+@media screen and (max-width: 768px) {
+
 }

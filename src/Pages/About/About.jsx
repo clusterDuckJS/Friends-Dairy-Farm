@@ -9,9 +9,9 @@ function About() {
         <h1 className='center bold mb-1'>About Friends Dairy Farm</h1>
         <p className='center'>A legacy of trust, purity, and tradition in every drop of milk</p>
       </section>
-      <section className="hero flex align-center">
+      <section className="hero flex align-center space-btw">
         <div className="text-wrapper">
-          <h2 className='bold mt-2'>Our Story</h2>
+          <h2 className='bold mb-2'>Our Story</h2>
           <p className='mb-2'>Friends Dairy Farm was founded with a simple vision: to bring pure, healthy, and authentic dairy products to the families of Chennai. Nestled in the outskirts of the city, our farm is home to indigenous cow breeds that produce pure A2 milk.</p>
           <p className="mb-2">We believe in traditional farming methods combined with modern hygiene standards. Our cows graze freely on natural grass, breathe fresh air, and are treated with love and respect. This translates directly into the quality and taste of our products.</p>
           <p className="mb-2">Every morning, we deliver freshness to your doorstep - not just milk, but a commitment to your family's health and well-being.</p>
@@ -97,24 +97,24 @@ function About() {
       </section>
 
       <section className="data flex space-btw gap-2">
-        <div className="wrapper ">
+        <div className="wrapper flex-column align-center">
           <h1 className='bold color-primary'>500+</h1>
-          <p className='bold color-primary'>Happy Families</p>
+          <p className='bold'>Happy Families</p>
         </div>
 
-        <div className="wrapper">
+        <div className="wrapper flex-column align-center">
           <h1 className='bold color-primary'>100%</h1>
-          <p className='bold color-primary'>Pure A2 Milk</p>
+          <p className='bold'>Pure A2 Milk</p>
         </div>
 
-        <div className="wrapper">
+        <div className="wrapper flex-column align-center">
           <h1 className='bold color-primary'>5 AM</h1>
-          <p className='bold color-primary'>Daily Delivery</p>
+          <p className='bold'>Daily Delivery</p>
         </div>
 
-        <div className="wrapper">
+        <div className="wrapper flex-column align-center">
           <h1 className='bold color-primary'>10+</h1>
-          <p className='bold color-primary'>Years Experience</p>
+          <p className='bold'>Years Experience</p>
         </div>
       </section>
     </div>
