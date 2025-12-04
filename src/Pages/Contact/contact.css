@@ -3,12 +3,14 @@
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
 
-        .form-container{
+        .form-container {
             height: fit-content;
-            button{
+
+            button {
                 justify-content: center;
             }
         }
+
         .contact-form {
             display: flex;
             flex-direction: column;
@@ -57,3 +59,17 @@
         }
     }
 }
+
+/*======== MEDIA QUERIES (MEDIUM DEVICES) ======== */
+@media screen and (max-width: 1024px) {
+    .main-container.contact {
+        .info-wrapper {
+            display: grid;
+            grid-template-columns: none;
+        }
+    }
+}
+
+
+/*======== MEDIA QUERIES (SMALL DEVICES) ======== */
+@media screen and (max-width: 768px) {}

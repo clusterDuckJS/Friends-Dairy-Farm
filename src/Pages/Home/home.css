@@ -66,14 +66,16 @@
         .hero {
             flex-direction: column;
             align-items: flex-start;
-            img{
+
+            img {
                 width: 100%;
             }
+
         }
 
 
-        .products{
-            .card-container{
+        .products {
+            .card-container {
                 grid-template-columns: none;
             }
         }
@@ -84,5 +86,19 @@
 
 /*======== MEDIA QUERIES (SMALL DEVICES) ======== */
 @media screen and (max-width: 768px) {
+    .main-container.home {
+        .hero {
+            flex-direction: column;
+            align-items: flex-start;
+
+            img {
+                width: 100%;
+            }
+            .btn-container{
+                flex-direction: column;
+            }
+        }
+
+    }
 
 }

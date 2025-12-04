@@ -3,7 +3,11 @@ import './products.css'
 import MILK from '../../assets/milk.webp'
 import GHEE from '../../assets/ghee.webp'
 import { LuArrowRight, LuCircleCheckBig, LuShoppingCart } from 'react-icons/lu'
+import { useNavigate } from 'react-router-dom'
+
 function Products() {
+  const navigate = useNavigate();
+  
   return (
     <div className="main-container products">
       <section className="intro flex-column align-center">
@@ -76,7 +80,7 @@ function Products() {
       <section className="start-journey flex-column align-center">
         <h1 className='bold center white mb-2'>Start Your Healthy Journey Today</h1>
         <p className='center white mb-2'>Subscribe now and get fresh A2 milk delivered to your doorstep every morning</p>
-        <button className='primary'>Schedule Your Delivery <LuArrowRight /></button>
+        <button className='primary' onClick={() => navigate('/profile')}>Schedule Your Delivery <LuArrowRight /></button>
       </section>
     </div>
   )

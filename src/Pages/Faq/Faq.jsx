@@ -1,7 +1,9 @@
 import React from 'react'
 import './faq.css'
+import { useNavigate } from 'react-router-dom'
 
 function Faq() {
+    const navigate = useNavigate();
     return (
         <div className='main-container faq'>
             <section className="intro flex-column align-center bg-light">
@@ -47,7 +49,7 @@ function Faq() {
             <section className="start-journey flex-column align-center bg-primary">
                 <h1 className='bold center white mb-2'>Still Have Questions?</h1>
                 <p className='center white mb-2'>Can't find the answer you're looking for? Our team is here to help.</p>
-                <button className='primary'>Contact Us</button>
+                <button className='primary' onClick={() => {navigate('/contact')}}>Contact Us</button>
             </section>
         </div>
     )

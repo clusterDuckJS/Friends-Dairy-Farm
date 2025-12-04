@@ -3,7 +3,8 @@
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 2rem;
-        img{
+
+        img {
             object-fit: cover;
             width: 100%;
             height: 18rem;
@@ -12,3 +13,16 @@
     }
 
 }
+
+/*======== MEDIA QUERIES (MEDIUM DEVICES) ======== */
+@media screen and (max-width: 1024px) {
+    .main-container.gallery {
+        .gallery-container {
+            grid-template-columns: repeat(1, minmax(0, 1fr));
+        }
+    }
+}
+
+
+/*======== MEDIA QUERIES (SMALL DEVICES) ======== */
+@media screen and (max-width: 768px) {}

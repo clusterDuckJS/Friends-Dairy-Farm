@@ -1,0 +1,100 @@
+/* profile.css */
+.page-shell {
+  padding: 40px 24px;
+  max-width: 1100px;
+  margin: 0 auto;
+  /* font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial; */
+  color: #111;
+}
+
+.page-title {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 18px;
+  box-shadow: 0 10px 28px rgba(20,20,20,0.04);
+  border: 1px solid rgba(245,216,172,0.55);
+  margin-bottom: 18px;
+}
+
+.account-card .account-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 40px;
+  align-items: start;
+}
+
+.muted-label {
+  font-weight: 700;
+  color: #2f2f2f;
+  margin-top: 8px;
+}
+
+.muted-value {
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.profile-form {
+  margin-top: 8px;
+  display: grid;
+  gap: 10px;
+}
+
+.label { font-size: 13px; font-weight: 600; color:#333; margin-bottom:4px; }
+.input {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border:1px solid #f3dcb1;
+  font-size: 14px;
+}
+.input-area { min-height: 80px; resize:vertical; }
+
+.form-actions {
+  display:flex;
+  gap:12px;
+  margin-top:8px;
+}
+
+.primary-btn {
+  background: linear-gradient(180deg,#c76d03,#b55c02);
+  color: white;
+  padding: 9px 14px;
+  border-radius: 8px;
+  border:none;
+  font-weight:700;
+  cursor:pointer;
+}
+.ghost-btn {
+  background: transparent;
+  border: 1px solid #e6c89b;
+  padding:9px 12px;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+.empty { padding: 12px; color: #666; display:flex; gap:10px; align-items:center; }
+
+.sub-card { margin-bottom: 12px; }
+.sub-grid {
+  display:grid;
+  grid-template-columns: 1fr 1fr 240px;
+  gap: 6px 18px;
+  align-items:start;
+}
+.sub-meta { text-align:right; }
+
+.primary-btn-sm {
+  background: linear-gradient(180deg,#c76d03,#b55c02);
+  color:white;
+  padding:6px 10px;
+  border-radius:6px;
+  border:none;
+  cursor:pointer;
+  font-weight:700;
+}

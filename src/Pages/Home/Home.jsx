@@ -5,8 +5,12 @@ import MILK from '../../assets/milk.webp'
 import GHEE from '../../assets/ghee.webp'
 import { LuArrowRight, LuHeart, LuLeaf, LuMilk, LuTruck } from 'react-icons/lu'
 import { GoStarFill } from 'react-icons/go'
+import { useNavigate } from 'react-router-dom'
 
 function Home() {
+
+    const navigate = useNavigate();
+
     return (
         <div className='main-container home'>
             <section className="hero flex align-center gap-2">
@@ -17,8 +21,8 @@ function Home() {
                     <h1 className='bold mb-2'>To Your Home</h1>
                     <p className='mb-2'>Experience the goodness of traditional dairy farming. Fresh, pure A2 milk and handcrafted dairy products delivered daily to your doorstep in Chennai.</p>
                     <div className="btn-container">
-                        <button className='primary'>View Products <LuArrowRight /> </button>
-                        <button className='secondary'>Schedule Delivery</button>
+                        <button className='primary' onClick={() => navigate('/products')}>View Products <LuArrowRight /> </button>
+                        <button className='secondary' onClick={() => navigate('/profile')}>Schedule Delivery</button>
                     </div>
                 </div>
                 <img src={HERO} alt="cow" />

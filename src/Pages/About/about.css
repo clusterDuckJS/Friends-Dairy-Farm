@@ -1,13 +1,15 @@
 .main-container.about {
-    .intro{
+    .intro {
         background-color: var(--color-primary-light-50);
     }
-    .hero{
-        img{
+
+    .hero {
+        img {
             width: 35vw;
             border-radius: 0.5rem;
         }
     }
+
     .steps {
         background-color: var(--color-primary-light-50);
 
@@ -27,7 +29,7 @@
                 box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
                 width: 100%;
 
-                p{
+                p {
                     max-width: 100%;
                 }
             }
@@ -39,22 +41,29 @@
 
 /*======== MEDIA QUERIES (MEDIUM DEVICES) ======== */
 @media screen and (max-width: 1024px) {
-.main-container.about {
-    .hero{
-        flex-direction: column;
-        img{
-            width: 100%;
+    .main-container.about {
+        .hero {
+            flex-direction: column;
+
+            img {
+                width: 100%;
+            }
+        }
+
+        .steps {
+            .step-wrapper {
+                flex-direction: column;
+                margin-bottom: 1rem;
+                gap: 1rem;
+            }
+        }
+
+        .data {
+            flex-direction: column;
         }
     }
-
-        .data{
-        flex-direction: column;
-    }
-}
 }
 
 
 /*======== MEDIA QUERIES (SMALL DEVICES) ======== */
-@media screen and (max-width: 768px) {
-
-}
+@media screen and (max-width: 768px) {}

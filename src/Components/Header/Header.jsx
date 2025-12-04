@@ -1,12 +1,28 @@
 import React, { useState } from 'react'
 import './header.css'
 import LOGO from '../../assets/logo.webp'
-import { LuMenu, LuUser, LuX } from 'react-icons/lu'
+import { LuLogOut, LuMenu, LuUser, LuX } from 'react-icons/lu'
 import { NavLink, useNavigate } from 'react-router-dom';
+import { logoutUser } from '../../utils/auth';
 
 function Header() {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate()
+
+  async function handleLogout() {
+    try {
+      // disable UI or show spinner here if you want
+      await logoutUser();
+      console.log("Logged out successfully");
+      navigate("/login");
+    } catch (err) {
+      // show the real error in console and to user
+      console.error("Logout error:", err);
+      alert("Logout failed: " + (err?.message || JSON.stringify(err)));
+      // fallback: redirect to login anyway so user isn't stuck
+      navigate("/login");
+    }
+  }
 
   return (
     <>
@@ -37,7 +53,8 @@ function Header() {
 
         {/* Desktop user icon */}
         <div className="user-desktop">
-          <LuUser />
+          <LuUser onClick={() => navigate('/profile')} />
+          <LuLogOut onClick={handleLogout}/>
         </div>
 
         {/* Burger icon */}
@@ -56,12 +73,24 @@ function Header() {
         </button>
 
         <nav className="nav-mobile">
-          <p>Home</p>
-          <p>About</p>
-          <p>Products</p>
-          <p>Gallery</p>
-          <p>Contact</p>
-          <p>FAQ</p>
+         <NavLink to="/" end className="nav-link">
+            Home
+          </NavLink>
+          <NavLink to="/about" className="nav-link">
+            About
+          </NavLink>
+          <NavLink to="/products" className="nav-link">
+            Products
+          </NavLink>
+          <NavLink to="/gallery" className="nav-link">
+            Gallery
+          </NavLink>
+          <NavLink to="/contact" className="nav-link">
+            Contact
+          </NavLink>
+          <NavLink to="/faq" className="nav-link">
+            FAQ
+          </NavLink>
         </nav>
 
         <div className="mobile-user">

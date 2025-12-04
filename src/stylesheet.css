@@ -10,6 +10,7 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  interpolate-size: allow-keywords;
 
   --color-primary: #d97706;
   --color-primary-light: #ffbb6e;
@@ -132,6 +133,10 @@ li {
 
 /* ===================================================================================== */
 /* ===========================BUTTON=========================== */
+button, a, details{
+  cursor: pointer;
+}
+
 button.primary {
   padding: 0.4rem 2rem;
   background-color: var(--color-primary);
@@ -139,6 +144,7 @@ button.primary {
   color: white;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
   white-space: nowrap;
   font-weight: 500;
@@ -146,12 +152,13 @@ button.primary {
 }
 
 button.secondary {
-  padding: 0.5rem 2rem;
+  padding: 0.4rem 2rem;
   background-color: transparent;
   border: 2px solid var(--color-primary);
   color: var(--color-primary);
   display: flex;
   align-items: center;
+  justify-content: center;
   white-space: nowrap;
   gap: 0.5rem;
   font-weight: 500;
@@ -268,11 +275,15 @@ button.secondary {
 /*======== MEDIA QUERIES (MEDIUM DEVICES) ======== */
 @media screen and (max-width: 1024px) {
   section {
-    padding: 5rem 2rem;
+    padding: 5rem 4rem;
   }
 
   .card-container {
     flex-direction: column;
+  }
+
+  p{
+    max-width: 100%;
   }
 }
 
