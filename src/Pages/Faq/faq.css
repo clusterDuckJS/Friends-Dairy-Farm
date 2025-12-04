@@ -1,0 +1,24 @@
+.main-container.faq {
+    .faq-container {
+        padding: 5rem 20rem;
+
+        .card {
+            padding: 1.5rem;
+
+        }
+
+
+        details[open] {
+            summary {
+                margin-bottom: 0.5rem;
+            }
+        }
+    }
+
+    .start-journey{
+        button{
+            background-color: white;
+            color: var(--color-primary);
+        }
+    }
+}

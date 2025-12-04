@@ -57,12 +57,20 @@ section {
   color: var(--color-primary);
 }
 
-.color-success{
+.color-success {
   color: var(--color-success)
 }
 
 .center {
   text-align: center;
+}
+
+.bg-primary {
+  background-color: var(--color-primary);
+}
+
+.bg-light {
+  background-color: var(--color-primary-light-50);
 }
 
 /* ==============================TYPOGRAPHY============================== */
@@ -196,6 +204,10 @@ button.secondary {
 
 .align-center {
   align-items: center;
+}
+
+.align-start {
+  align-items: flex-start;
 }
 
 .gap-05 {
