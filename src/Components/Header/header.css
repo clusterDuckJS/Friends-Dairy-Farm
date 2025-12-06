@@ -1,6 +1,10 @@
 .header {
   width: 100%;
   padding: 16px 24px;
+  height: 68px;
+  position: sticky;
+  top: 0;
+  z-index: 2;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -14,6 +18,7 @@
   color: #333;
   padding-bottom: 4px;
   transition: 0.2s;
+  border-bottom: 2px solid transparent;
 }
 
 .nav-desktop .nav-link:hover {
@@ -39,13 +44,22 @@
 }
 
 .user-desktop {
-  font-size: 22px;
   cursor: pointer;
+  font-size: 1.2rem;
+
+  button.primary {
+    font-size: 1rem;
+    padding: 0.4rem 1rem;
+  }
+
+  .shopping-cart-wrapper {
+    position: relative;
+  }
 }
 
 /* BURGER BUTTON (mobile only) */
 .burger {
-  font-size: 26px;
+  font-size: 1.2rem;
   display: none;
   background: none;
   border: none;
@@ -66,7 +80,7 @@
   display: flex;
   flex-direction: column;
   gap: 24px;
-  z-index: 1;
+  z-index: 2;
   transition: right 0.3s ease;
 }
 

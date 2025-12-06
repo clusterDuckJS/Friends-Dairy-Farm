@@ -7,7 +7,6 @@ import Modal from '../../Components/Modal/Modal';
 import ScheduleModal from '../../Components/ScheduleModal/ScheduleModal';
 import { cancelSubscription } from '../../utils/subscription';
 import { getOrdersForUser } from '../../utils/orders';
-import { supabase } from '../../utils/supabaseClient';
 
 function Profile() {
     const user = useAuth();

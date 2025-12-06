@@ -1,17 +1,21 @@
 import React, { useState } from 'react'
 import './header.css'
 import LOGO from '../../assets/logo.webp'
-import { LuLogOut, LuMenu, LuUser, LuX } from 'react-icons/lu'
+import { LuLogOut, LuMenu, LuUser, LuX, LuShoppingCart } from 'react-icons/lu'
 import { NavLink, useNavigate } from 'react-router-dom';
 import { logoutUser } from '../../utils/auth';
 import { useCart } from '../../Context/CartContext';
 import CartModal from '../Modal/CartModal';
+import useIsAdmin from "../../hooks/useIsAdmin";
+import { useAuth } from '../../hooks/useAuth';
 
 function Header() {
   const [open, setOpen] = useState(false);
   const [showCart, setShowCart] = useState(false);
   const navigate = useNavigate()
   const { items } = useCart();
+  const { isAdmin, isLoading } = useIsAdmin();
+  const user = useAuth();
 
   async function handleLogout() {
     try {
@@ -27,6 +31,7 @@ function Header() {
       navigate("/login");
     }
   }
+
 
   return (
     <>
@@ -53,25 +58,36 @@ function Header() {
           <NavLink to="/faq" className="nav-link">
             FAQ
           </NavLink>
+          {isAdmin && (
+            <NavLink to="/admin" end className="nav-link">
+              Dashboard
+            </NavLink>
+          )}
+
         </nav>
 
-        {/* Desktop user icon */}
-        <div className="user-desktop">
-          <LuUser onClick={() => navigate('/profile')} />
-          <LuLogOut onClick={handleLogout} />
-
-          <button onClick={() => setShowCart(true)}>Cart ({items.length})</button>
-          <CartModal open={showCart} onClose={() => setShowCart(false)} onCompleted={() => {/* refresh UI if needed */ }} />
-
+        <div className="user-desktop flex">
+          {/* IF NOT LOGGED IN */}
+          {!user && (
+            <button className="primary" onClick={() => navigate("/login")}>
+              Login / Sign Up
+            </button>
+          )}
+          {/* IF LOGGED IN */}
+          {user && (
+            <div className='account-cart-wrapper flex align-center gap-2'>
+              <div className="shopping-cart-wrapper flex align-center">
+                <LuShoppingCart onClick={() => setShowCart(true)} />
+                <span className="badge">{items.length}</span>
+              </div>
+              <LuLogOut onClick={handleLogout} />
+            </div>
+          )}
         </div>
 
         {/* Burger icon */}
-        <button
-          className="burger"
-          onClick={() => setOpen(true)}
-        >
-          <LuMenu />
-        </button>
+        <LuMenu className="burger" onClick={() => setOpen(true)} />
+        <CartModal open={showCart} onClose={() => setShowCart(false)} onCompleted={() => {/* refresh UI if needed */ }} />
       </header>
 
       {/* MOBILE MENU */}
@@ -99,11 +115,17 @@ function Header() {
           <NavLink to="/faq" className="nav-link">
             FAQ
           </NavLink>
+          {isAdmin && (
+            <NavLink to="/admin" end className="nav-link">
+              Dashboard
+            </NavLink>
+          )}
         </nav>
 
         <div className="mobile-user">
-          <LuUser />
-          <span> My Account</span>
+          <LuUser onClick={() => navigate('/profile')} />
+          <LuLogOut onClick={handleLogout} />
+          <LuShoppingCart onClick={() => setShowCart(true)} />
         </div>
       </div>
     </>

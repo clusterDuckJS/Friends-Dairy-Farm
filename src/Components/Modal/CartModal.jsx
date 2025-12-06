@@ -5,6 +5,7 @@ import { createOrder } from "../../utils/orders";
 import { createSubscription } from "../../utils/subscription";
 import { computeNextDeliveryDate } from "../../utils/scheduleUtils"; // if you use recurring logic
 import { useCart } from "../../Context/CartContext";
+import { LuX } from "react-icons/lu";
 
 export default function CartModal({ open, onClose, onCompleted }) {
   const { items, total, clearCart } = useCart();
@@ -84,12 +85,15 @@ export default function CartModal({ open, onClose, onCompleted }) {
 
   return ReactDOM.createPortal(
     <div className="modal-overlay" onMouseDown={onClose}>
-      <div className="modal-box" onMouseDown={(e) => e.stopPropagation()}>
-        <h3>Cart</h3>
+      <div className="modal-box cart" onMouseDown={(e) => e.stopPropagation()}>
+        <div className="heading-wrapper flex space-btw mb-1">
+          <h3>Cart</h3>
+          <LuX className="pointer" onClick={onClose} />
+        </div> 
 
         <div style={{ maxHeight: 320, overflow: "auto" }}>
           {items.map(it => (
-            <div key={it.id} style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
+            <div key={it.id} className="flex space-btw mb-05">
               <div>
                 <div style={{ fontWeight: 700 }}>{it.name}</div>
                 <div>Qty: {it.qty}</div>
@@ -99,26 +103,24 @@ export default function CartModal({ open, onClose, onCompleted }) {
           ))}
         </div>
 
-        <div style={{ marginTop: 12, fontWeight: 700 }}>Total: ₹{total.toFixed(2)}</div>
+        <p className="bold mb-1 mt-1 total-value">Total: ₹{total.toFixed(2)}</p>
 
-        <hr />
-
-        <div>
+        <div className="btn-container mb-1">
           <label><input type="radio" checked={mode === "one-time"} onChange={() => setMode("one-time")} /> One-time order</label>
-          <label style={{ marginLeft: 12 }}><input type="radio" checked={mode === "recurring"} onChange={() => setMode("recurring")} /> Recurring subscription</label>
+          <label><input type="radio" checked={mode === "recurring"} onChange={() => setMode("recurring")} /> Recurring subscription</label>
         </div>
 
         {mode === "one-time" && (
-          <>
-            <label className="label">Delivery date</label>
+          <div className="btn-container mb-1">
+            <label className="bold">Delivery date: </label>
             <input type="date" className="input" value={oneTimeDate} onChange={e => setOneTimeDate(e.target.value)} />
-          </>
+          </div>
         )}
 
         {mode === "recurring" && (
           <>
-            <div>
-              <label className="label">Recurring type</label>
+            <div className="btn-container mb-05">
+              <label>Recurring type: </label>
               <select value={recurringType} onChange={e => setRecurringType(e.target.value)}>
                 <option value="daily">Daily</option>
                 <option value="weekly">Weekly</option>
@@ -127,20 +129,24 @@ export default function CartModal({ open, onClose, onCompleted }) {
 
             {recurringType === "daily" && (
               <>
-                <label className="label">Start date</label>
-                <input type="date" className="input" value={dailyStart} onChange={e => setDailyStart(e.target.value)} />
-                <label className="label">Every N days</label>
-                <input type="number" className="input" min="1" value={dailyEvery} onChange={e => setDailyEvery(e.target.value)} />
+                <div className="btn-container mb-05">
+                  <label >Start date</label>
+                  <input type="date" value={dailyStart} onChange={e => setDailyStart(e.target.value)} />
+                </div>
+                <label className="btn-container" >Deliver every
+                  <input type="number" min="1" value={dailyEvery} onChange={e => setDailyEvery(e.target.value)} />
+                  days</label>
               </>
+
             )}
 
             {recurringType === "weekly" && (
               <>
-                <label className="label">Start date</label>
+                <label >Start date</label>
                 <input type="date" className="input" value={weeklyStart} onChange={e => setWeeklyStart(e.target.value)} />
-                <label className="label">Days</label>
+                <label >Days</label>
                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                  {["mon","tue","wed","thu","fri","sat","sun"].map(d => (
+                  {["mon", "tue", "wed", "thu", "fri", "sat", "sun"].map(d => (
                     <button key={d} type="button" className="pill" onClick={() => {
                       setWeeklyDays(prev => prev.includes(d) ? prev.filter(x => x !== d) : [...prev, d]);
                     }}>{d}</button>
@@ -150,11 +156,8 @@ export default function CartModal({ open, onClose, onCompleted }) {
             )}
           </>
         )}
+        <button className="primary" onClick={handlePlace} disabled={loading}>{loading ? "Placing..." : (mode === "one-time" ? "Place Order" : "Create Subscription")}</button>
 
-        <div className="modal-actions">
-          <button className="primary-btn" onClick={handlePlace} disabled={loading}>{loading ? "Placing..." : (mode === "one-time" ? "Place Order" : "Create Subscription")}</button>
-          <button className="ghost-btn" onClick={onClose}>Close</button>
-        </div>
       </div>
     </div>,
     document.body

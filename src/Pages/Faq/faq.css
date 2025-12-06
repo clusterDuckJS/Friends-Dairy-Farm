@@ -49,5 +49,11 @@
     }
 }
 
-    /*======== MEDIA QUERIES (SMALL DEVICES) ======== */
-    @media screen and (max-width: 768px) {}
+/*======== MEDIA QUERIES (SMALL DEVICES) ======== */
+@media screen and (max-width: 768px) {
+    .main-container.faq {
+        .faq-container {
+            padding: 5rem 1rem;
+        }
+    }
+}
