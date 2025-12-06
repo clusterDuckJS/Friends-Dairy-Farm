@@ -94,11 +94,10 @@
             img {
                 width: 100%;
             }
-            .btn-container{
+
+            .btn-container {
                 flex-direction: column;
             }
         }
-
     }
-
 }

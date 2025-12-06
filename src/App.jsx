@@ -11,6 +11,7 @@ import Login from './Pages/Login/Login'
 import Profile from './Pages/Profile/Profile'
 import { supabase } from './utils/supabaseClient'
 import PrivateRoute from './Components/PrivateRoute'
+import AdminDashboardPage from './Pages/AdminDashboard/AdminDashboard'
 
 
 function App() {
@@ -33,6 +34,7 @@ function App() {
             <Profile />
           </PrivateRoute>} />
         <Route path="/login" element={<Login />} />
+        <Route path="/admin" element={<AdminDashboardPage />} />
       </Routes>
       {!hideFooter && <Footer />}
 

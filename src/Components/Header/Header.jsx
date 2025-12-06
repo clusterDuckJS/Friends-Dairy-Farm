@@ -4,10 +4,14 @@ import LOGO from '../../assets/logo.webp'
 import { LuLogOut, LuMenu, LuUser, LuX } from 'react-icons/lu'
 import { NavLink, useNavigate } from 'react-router-dom';
 import { logoutUser } from '../../utils/auth';
+import { useCart } from '../../Context/CartContext';
+import CartModal from '../Modal/CartModal';
 
 function Header() {
   const [open, setOpen] = useState(false);
+  const [showCart, setShowCart] = useState(false);
   const navigate = useNavigate()
+  const { items } = useCart();
 
   async function handleLogout() {
     try {
@@ -54,7 +58,11 @@ function Header() {
         {/* Desktop user icon */}
         <div className="user-desktop">
           <LuUser onClick={() => navigate('/profile')} />
-          <LuLogOut onClick={handleLogout}/>
+          <LuLogOut onClick={handleLogout} />
+
+          <button onClick={() => setShowCart(true)}>Cart ({items.length})</button>
+          <CartModal open={showCart} onClose={() => setShowCart(false)} onCompleted={() => {/* refresh UI if needed */ }} />
+
         </div>
 
         {/* Burger icon */}
@@ -73,7 +81,7 @@ function Header() {
         </button>
 
         <nav className="nav-mobile">
-         <NavLink to="/" end className="nav-link">
+          <NavLink to="/" end className="nav-link">
             Home
           </NavLink>
           <NavLink to="/about" className="nav-link">

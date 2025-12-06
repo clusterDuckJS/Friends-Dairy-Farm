@@ -3,6 +3,11 @@ import './profile.css'
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { getProfile, getSubscriptionsForUser, upsertProfile } from '../../utils/profile';
+import Modal from '../../Components/Modal/Modal';
+import ScheduleModal from '../../Components/ScheduleModal/ScheduleModal';
+import { cancelSubscription } from '../../utils/subscription';
+import { getOrdersForUser } from '../../utils/orders';
+import { supabase } from '../../utils/supabaseClient';
 
 function Profile() {
     const user = useAuth();
@@ -16,6 +21,8 @@ function Profile() {
         delivery_address: "",
     });
     const [subscriptions, setSubscriptions] = useState([]);
+    const [showSchedule, setShowSchedule] = useState(false);
+    const [orders, setOrders] = useState([]);
 
     useEffect(() => {
         if (user === undefined) return; // still loading auth
@@ -25,6 +32,7 @@ function Profile() {
         }
 
         async function fetchData() {
+
             setLoading(true);
             try {
                 const p = await getProfile(user.id);
@@ -44,6 +52,9 @@ function Profile() {
                 }
                 const subs = await getSubscriptionsForUser(user.id);
                 setSubscriptions(subs);
+
+                const ords = await getOrdersForUser(user.id);
+                setOrders(ords || []);
             } catch (err) {
                 console.error("Profile load error:", err);
                 alert("Failed to load profile. Check console.");
@@ -54,6 +65,24 @@ function Profile() {
 
         fetchData();
     }, [user, navigate]);
+
+
+    async function handleCancel(id) {
+        const confirmCancel = window.confirm("Are you sure you want to cancel this delivery?");
+        if (!confirmCancel) return;
+
+        try {
+            await cancelSubscription(id);
+
+            // refresh subscriptions
+            const subs = await getSubscriptionsForUser(user.id);
+            setSubscriptions(subs);
+
+        } catch (err) {
+            console.error("Cancel error:", err);
+            alert("Failed to cancel subscription");
+        }
+    }
 
     async function handleSave(e) {
         e?.preventDefault();
@@ -116,7 +145,7 @@ function Profile() {
 
                     <div className="form-actions">
                         <button className="primary" type="submit" disabled={saving}>{saving ? "Saving..." : "Save profile"}</button>
-                        <button type="button" className="secondary" onClick={() => navigate("/schedule")}>Schedule New Delivery</button>
+                        <button type="button" className="secondary" onClick={() => setShowSchedule(true)}>Schedule New Delivery</button>
                     </div>
                 </form>
             </div>
@@ -124,16 +153,18 @@ function Profile() {
             <h2 className="page-title" style={{ marginTop: 28 }}>Active Subscriptions</h2>
 
             <div>
-                {subscriptions.length === 0 ? (
+                {subscriptions.filter(s => s.is_active).length === 0 ? (
                     <div className="empty">No active subscriptions.
                         <button className="primary" onClick={() => navigate("/products")}>Browse products</button>
                     </div>
-                ) : subscriptions.map(sub => (
+                ) : subscriptions.filter(sub => sub.is_active).map(sub => (
                     <div className="card sub-card" key={sub.id}>
                         <div className="sub-grid">
+
                             <div>
                                 <div className="muted-label">Name</div>
                                 <div className="muted-value">{sub.product_name}</div>
+
                                 <div className="muted-label">Delivery Address</div>
                                 <div className="muted-value">{profile.delivery_address || <em>—</em>}</div>
                             </div>
@@ -148,15 +179,88 @@ function Profile() {
 
                             <div className="sub-meta">
                                 <div className="muted-label">Schedule</div>
-                                <div className="muted-value">{sub.schedule_type} {sub.schedule_meta ? JSON.stringify(sub.schedule_meta) : ""}</div>
+                                <div className="muted-value">
+                                    {sub.schedule_type} {sub.schedule_meta ? JSON.stringify(sub.schedule_meta) : ""}
+                                </div>
 
                                 <div className="muted-label">Next Delivery</div>
                                 <div className="muted-value">{sub.next_delivery_date || "—"}</div>
+
+                                {/* CANCEL BUTTON */}
+                                <button
+                                    className="secondary"
+                                    onClick={() => handleCancel(sub.id)}
+                                    style={{ marginTop: "10px" }}
+                                >
+                                    Cancel Delivery
+                                </button>
                             </div>
+
                         </div>
                     </div>
+
                 ))}
             </div>
+
+            <div>
+                {orders.length === 0 ? (
+                    <div className="empty">
+                        No orders yet. <button className="primary-btn-sm" onClick={() => navigate("/products")}>Shop now</button>
+                    </div>
+                ) : (
+                    orders.map(order => (
+                        <div className="card order-card" key={order.id}>
+                            <div className="order-grid">
+                                <div>
+                                    <div className="muted-label">Order</div>
+                                    <div className="muted-value">#{order.id.slice(0, 8)}</div>
+
+                                    <div className="muted-label">Items</div>
+                                    <div className="muted-value">
+                                        {Array.isArray(order.items) ? (
+                                            <ul style={{ margin: 0, paddingLeft: 16 }}>
+                                                {order.items.map((it, i) => (
+                                                    <li key={i}>{it.name} ×{it.qty} — ₹{(Number(it.price || 0) * Number(it.qty || 1)).toFixed(2)}</li>
+                                                ))}
+                                            </ul>
+                                        ) : (
+                                            <pre style={{ margin: 0 }}>{JSON.stringify(order.items)}</pre>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div className="muted-label">Total</div>
+                                    <div className="muted-value">₹{Number(order.total_amount || 0).toFixed(2)}</div>
+
+                                    <div className="muted-label">Payment</div>
+                                    <div className="muted-value">{order.payment_method || "cod"}</div>
+                                </div>
+
+                                <div className="order-meta">
+                                    <div className="muted-label">Schedule</div>
+                                    <div className="muted-value">{order.schedule_type} {order.schedule_meta ? JSON.stringify(order.schedule_meta) : ""}</div>
+
+                                    <div className="muted-label">Status</div>
+                                    <div className="muted-value">{order.status}</div>
+
+                                    <div className="muted-label">Placed</div>
+                                    <div className="muted-value">{new Date(order.created_at).toLocaleString()}</div>
+                                </div>
+                            </div>
+                        </div>
+                    ))
+                )}
+            </div>
+            <Modal open={showSchedule} onClose={() => setShowSchedule(false)}>
+                <ScheduleModal
+                    onClose={() => setShowSchedule(false)}
+                    onCreated={async () => {
+                        const subs = await getSubscriptionsForUser(user.id);
+                        setSubscriptions(subs);
+                    }}
+                />
+            </Modal>
         </div>
     )
 }

@@ -1,12 +1,38 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import './products.css'
 import MILK from '../../assets/milk.webp'
 import GHEE from '../../assets/ghee.webp'
 import { LuArrowRight, LuCircleCheckBig, LuShoppingCart } from 'react-icons/lu'
 import { useNavigate } from 'react-router-dom'
+import { useCart } from '../../Context/CartContext'
+import ProductCard from '../../Components/ProductCard/ProductCard'
+import { getProducts } from '../../utils/products'
 
 function Products() {
   const navigate = useNavigate();
+  const { addToCart } = useCart();
+
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let mounted = true;
+    async function load() {
+      setLoading(true);
+      try {
+        const data = await getProducts();
+        if (mounted) setProducts(data);
+      } catch (err) {
+        console.error("Products load failed", err);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    }
+    load();
+    return () => { mounted = false; };
+  }, []);
+
+  if (loading) return <div className="page-shell">Loading products…</div>;
   
   return (
     <div className="main-container products">
@@ -17,63 +43,9 @@ function Products() {
 
       <section className="products flex-column align-center gap-2">
         <div className="card-container mb-2">
-          <div className="card">
-            <img src={MILK} alt="milk" />
-            <div className="text-wrapper">
-              <h3 className='bold mb-1'>A2 Milk</h3>
-              <p className='mb-1'>Traditional hand-churned ghee made from pure A2 milk. Rich aroma and authentic taste.</p>
-              <ul className='mb-1'>
-                <li className='mb-1'><LuCircleCheckBig className='color-success' /> 100% Pure A2 Milk</li>
-                <li className='mb-1'><LuCircleCheckBig className='color-success' /> From Grass-Fed Cows</li>
-                <li className='mb-1'><LuCircleCheckBig className='color-success' /> No Hormones or Antibiotics</li>
-                <li className='mb-1'><LuCircleCheckBig className='color-success' /> Farm Fresh Daily</li>
-              </ul>
-              <p className='bold mb-1'>Available Sizes:</p>
-              <div className="price-card flex space-btw align-center mb-1">
-                <div className="text-wrapper">
-                  <p className='bold'>0.5L</p>
-                  <h3 className='color-primary bold'>₹45</h3>
-                </div>
-                <button className='primary'><LuShoppingCart /> Add to cart</button>
-              </div>
-              <div className="price-card flex space-btw align-center">
-                <div className="text-wrapper">
-                  <p className='bold'>1L</p>
-                  <h3 className='color-primary bold'>₹85</h3>
-                </div>
-                <button className='primary'><LuShoppingCart /> Add to cart</button>
-              </div>
-            </div>
-          </div>
-
-          <div className="card">
-            <img src={GHEE} alt="ghee" />
-            <div className="text-wrapper">
-              <h3 className='bold mb-1'>Pure Ghee</h3>
-              <p className='mb-1'>Traditional hand-churned ghee made from pure A2 milk. Rich aroma and authentic taste.</p>
-              <ul className='mb-1'>
-                <li className='mb-1'><LuCircleCheckBig className='color-success' /> Made from A2 Milk</li>
-                <li className='mb-1'><LuCircleCheckBig className='color-success' /> Hand-Churned</li>
-                <li className='mb-1'><LuCircleCheckBig className='color-success' /> No Preservatives</li>
-                <li className='mb-1'><LuCircleCheckBig className='color-success' /> Traditional Method</li>
-              </ul>
-              <p className='bold mb-1'>Available Sizes:</p>
-              <div className="price-card flex space-btw align-center mb-1">
-                <div className="text-wrapper">
-                  <p className='bold'>0.5L</p>
-                  <h3 className='color-primary bold'>₹550</h3>
-                </div>
-                <button className='primary'><LuShoppingCart /> Add to cart</button>
-              </div>
-              <div className="price-card flex space-btw align-center">
-                <div className="text-wrapper">
-                  <p className='bold'>1L</p>
-                  <h3 className='color-primary bold'>₹1050</h3>
-                </div>
-                <button className='primary'><LuShoppingCart /> Add to cart</button>
-              </div>
-            </div>
-          </div>
+          {products.map(p => (
+          <ProductCard key={p.id} product={p} />
+        ))}
         </div>
       </section>
 
