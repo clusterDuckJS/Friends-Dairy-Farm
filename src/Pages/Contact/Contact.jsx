@@ -34,7 +34,7 @@ function Contact() {
                             </div>
                             <div className="contact-text-wrapper">
                                 <p className='bold'>Email</p>
-                                <p>info@friendsdairyfarm.com</p>
+                                <p>fdfchennai@gmail.com</p>
                                 <p>We'll respond within 24 hours</p>
                             </div>
                         </div>
