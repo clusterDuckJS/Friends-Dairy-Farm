@@ -1,0 +1,80 @@
+/* admin-dashboard.css - place in same folder as AdminDashboard.jsx */
+
+.admin-shell { padding: 22px; max-width: 1200px; margin: 0 auto; }
+.admin-head h1 { margin: 0; font-size: 28px; }
+.admin-head .muted { color: #666; margin-top: 6px; }
+
+/* tabs like login tabs */
+.tabs { display:flex; gap:8px; margin-top:18px; margin-bottom:18px; }
+.tab {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: #f3efe6;
+  cursor: pointer;
+  font-weight: 600;
+  color: #6b4a00;
+}
+.tab.active {
+  background: white;
+  border: 1px solid #f0d9b7;
+  box-shadow: 0 6px 18px rgba(160,120,60,0.06);
+}
+
+/* panel */
+.tab-panel { background: white; padding: 16px; border-radius: 8px; box-shadow: 0 6px 26px rgba(0,0,0,0.04); }
+
+/* tables */
+.admin-table { width: 100%; border-collapse: collapse; }
+.admin-table thead th {
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 1px solid #eee;
+  font-size: 13px;
+  color: #333;
+}
+.admin-table tbody td {
+  padding: 12px;
+  border-bottom: 1px solid #faf5ee;
+  vertical-align: middle;
+}
+.admin-table tbody tr:hover { background: #fffaf6; }
+
+/* helper styles */
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", monospace; color:#444; }
+.empty { padding: 18px; color:#666; }
+.panel-title { margin: 0 0 12px 0; }
+
+/* small badges */
+.badge-small {
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 12px;
+  display: inline-block;
+}
+.badge-grey { background:#f3f4f6; color:#444; }
+.badge-blue { background:#dbeafe; color:#034ea2; }
+.badge-green { background:#d1fae5; color:#065f46; }
+.badge-red { background:#fee2e2; color:#7f1d1d; }
+
+/* small button */
+.btn {
+  background: #ff8a00;
+  border: 0;
+  color: white;
+  padding: 8px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 700;
+}
+.btn.ghost { background: transparent; color: #333; border: 1px solid #ddd; }
+.btn[disabled] { opacity: 0.6; cursor: not-allowed; }
+
+/* responsive */
+@media (max-width: 900px) {
+  .admin-shell { padding: 12px; }
+  .admin-table thead { display:none; }
+  .admin-table tbody td { display:block; width:100%; }
+  .admin-table tbody tr { margin-bottom: 12px; display:block; border-bottom:1px solid #eee; }
+}

@@ -3,7 +3,7 @@
   line-height: 1.5;
   font-weight: 400;
 
-  color: #111827;
+  color: #333;
   background-color: white;
 
   font-synthesis: none;
@@ -16,7 +16,8 @@
   --color-primary-light: #ffbb6e;
   --color-primary-light-50: #fef3e8;
   --color-text: #111827;
-  --color-success: #16a34a
+  --color-success: #16a34a;
+  --color-error: #ff4141;
 }
 
 /* start---------------CSS resets---------------start */
@@ -43,6 +44,11 @@ section {
   padding: 6rem 10rem;
 }
 
+.logo-section {
+  max-height: 225px;
+  margin-top: -58px;
+}
+
 .tag {
   padding: 0.2rem 0.8rem;
   background-color: var(--color-primary-light);
@@ -50,7 +56,7 @@ section {
 }
 
 .badge {
-  background-color: red;
+  background-color: var(--color-error);
   color: white;
   position: absolute;
   top: -8px;
@@ -62,7 +68,8 @@ section {
   border-radius: 50%;
   font-size: 12px;
 }
-.pointer{
+
+.pointer {
   cursor: pointer;
 }
 
@@ -186,6 +193,10 @@ button.primary {
   white-space: nowrap;
   font-weight: 500;
   border-radius: 0.3rem;
+
+  &.sm {
+    padding: 0.4rem 0.5rem;
+  }
 }
 
 button.secondary {
@@ -200,6 +211,15 @@ button.secondary {
   gap: 0.5rem;
   font-weight: 500;
   border-radius: 0.3rem;
+
+  &.cancel {
+    border-color: var(--color-error);
+    color: var(--color-error);
+  }
+
+  &.sm {
+    padding: 0.4rem 0.5rem;
+  }
 }
 
 .btn-container {
@@ -240,6 +260,10 @@ button.secondary {
 
 .justify-center {
   justify-content: center;
+}
+
+.justify-end {
+  justify-content: end;
 }
 
 .space-btw {
@@ -304,7 +328,6 @@ button.secondary {
 .mt-3 {
   margin-top: 3rem;
 }
-
 
 /* ====================================================================== */
 

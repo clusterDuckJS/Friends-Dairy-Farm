@@ -1,11 +1,13 @@
 import React from 'react'
 import './about.css'
-import { LuArrowRight, LuAward, LuHeart, LuTruck, LuUsers } from 'react-icons/lu'
+import Logo from '../../assets/logo.webp'
+import { LuAward, LuHeart, LuTruck, LuUsers } from 'react-icons/lu'
 
 function About() {
   return (
     <div className="main-container about">
       <section className="intro flex-column align-center">
+        <img src={Logo} className='logo-section' alt="Friends Dairy Farm Logo" />
         <h1 className='center bold mb-1'>About Friends Dairy Farm</h1>
         <p className='center'>A legacy of trust, purity, and tradition in every drop of milk</p>
       </section>

@@ -1,28 +1,36 @@
 // /src/utils/auth.js
 import { supabase } from "./supabaseClient";
 
-async function _ensureProfileRow(userId, { full_name = "", phone_number = "" } = {}) {
+async function _ensureProfileRow(
+  userId,
+  { full_name = "", phone_number = "", email = "" } = {}
+) {
   if (!userId) return null;
+
   const { data, error } = await supabase
     .from("profiles")
-    .upsert({
-      id: userId,
-      full_name,
-      phone: phone_number,
-      delivery_address: null,
-      updated_at: new Date().toISOString()
-    }, { onConflict: "id" })
+    .upsert(
+      {
+        id: userId,
+        full_name,
+        phone: phone_number,
+        email,                     // ⭐ added here
+        delivery_address: null,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "id" }
+    )
     .select()
     .maybeSingle();
 
-  // if error here, we don't throw — signUp should still return success.
-  // but we log it for debugging.
   if (error) {
     console.error("ensureProfileRow error:", error);
     return null;
   }
+
   return data;
 }
+
 
 export async function signUpUser({ email, password, fullName, phone }) {
   const { data, error } = await supabase.auth.signUp({

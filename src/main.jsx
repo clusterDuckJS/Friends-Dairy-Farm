@@ -4,11 +4,14 @@ import './stylesheet.css'
 import App from './App.jsx'
 import { HashRouter } from 'react-router-dom'
 import { CartProvider } from './Context/CartContext.jsx'
+import { ToastProvider } from './Context/ToastContext.jsx'
 
 createRoot(document.getElementById('root')).render(
   <HashRouter>
-    <CartProvider>
-      <App />
-    </CartProvider>
+    <ToastProvider>
+      <CartProvider>
+        <App />
+      </CartProvider>
+    </ToastProvider>
   </HashRouter>,
 )

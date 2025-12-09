@@ -1,5 +1,6 @@
 import React from 'react'
 import './faq.css'
+import Logo from '../../assets/logo.webp'
 import { useNavigate } from 'react-router-dom'
 
 function Faq() {
@@ -7,6 +8,7 @@ function Faq() {
     return (
         <div className='main-container faq'>
             <section className="intro flex-column align-center bg-light">
+                <img src={Logo} className='logo-section' alt="Friends Dairy Farm Logo" />
                 <h1 className='center bold mb-1'>Frequently Asked Questions</h1>
                 <p className='center'>Find answers to common questions about our products, delivery, and services</p>
             </section>

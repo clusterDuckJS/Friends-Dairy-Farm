@@ -1,11 +1,13 @@
 import React from 'react'
 import './contact.css'
+import Logo from '../../assets/logo.webp'
 import { LuClock, LuMail, LuMapPin, LuPhone } from 'react-icons/lu'
 
 function Contact() {
     return (
         <div className='main-container contact'>
             <section className="intro flex-column align-center bg-light">
+                <img src={Logo} className='logo-section' alt="Friends Dairy Farm Logo" />
                 <h1 className='center bold mb-1'>Get in Touch</h1>
                 <p className='center'>Have questions? We'd love to hear from you. Send us a message and we'll respond as soon as possible.</p>
             </section>

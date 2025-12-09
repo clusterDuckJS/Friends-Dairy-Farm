@@ -1,11 +1,13 @@
 import React from 'react'
 import './gallery.css'
+import Logo from '../../assets/logo.webp'
 import { LuArrowRight } from 'react-icons/lu'
 
 function Gallery() {
     return (
         <div className='main-container gallery'>
             <section className="intro flex-column align-center bg-light">
+                <img src={Logo} className='logo-section' alt="Friends Dairy Farm Logo" />
                 <h1 className='center bold mb-1'>Our Farm Gallery</h1>
                 <p className='center'>A glimpse into our daily operations and the love we put into every product</p>
             </section>

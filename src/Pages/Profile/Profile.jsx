@@ -7,6 +7,8 @@ import Modal from '../../Components/Modal/Modal';
 import ScheduleModal from '../../Components/ScheduleModal/ScheduleModal';
 import { cancelSubscription } from '../../utils/subscription';
 import { getOrdersForUser } from '../../utils/orders';
+import { useToast } from '../../Context/ToastContext';
+import { supabase } from '../../utils/supabaseClient';
 
 function Profile() {
     const user = useAuth();
@@ -22,6 +24,10 @@ function Profile() {
     const [subscriptions, setSubscriptions] = useState([]);
     const [showSchedule, setShowSchedule] = useState(false);
     const [orders, setOrders] = useState([]);
+    const toast = useToast();
+
+
+
 
     useEffect(() => {
         if (user === undefined) return; // still loading auth
@@ -31,6 +37,10 @@ function Profile() {
         }
 
         async function fetchData() {
+            const { data, error } = await supabase.from('profiles').select('*').order('created_at', { ascending: false });
+            console.log({ data, error });
+
+            supabase.from('profiles').select('*').order('created_at', { ascending:false }).then(r => console.log("profiles select:", r));
 
             setLoading(true);
             try {
@@ -56,7 +66,7 @@ function Profile() {
                 setOrders(ords || []);
             } catch (err) {
                 console.error("Profile load error:", err);
-                alert("Failed to load profile. Check console.");
+                toast.error("Failed to load profile. Check console.");
             } finally {
                 setLoading(false);
             }
@@ -79,7 +89,7 @@ function Profile() {
 
         } catch (err) {
             console.error("Cancel error:", err);
-            alert("Failed to cancel subscription");
+            toast.error("Failed to cancel subscription");
         }
     }
 
@@ -94,10 +104,10 @@ function Profile() {
                 delivery_address: profile.delivery_address,
             });
 
-            alert("Profile saved.");
+            toast.success("Profile saved.");
         } catch (err) {
             console.error("Save profile error:", err);
-            alert("Failed to save profile: " + (err?.message || err));
+            toast.error("Failed to save profile: " + (err?.message || err));
         } finally {
             setSaving(false);
         }
@@ -106,6 +116,55 @@ function Profile() {
     if (user === undefined || loading) {
         return <div className="page-shell"><p>Loading account…</p></div>;
     }
+
+    function safeParseMeta(m) {
+        if (!m) return {};
+        if (typeof m === "object") return m;
+        try {
+            return JSON.parse(m);
+        } catch (e) {
+            return {};
+        }
+    }
+
+    function formatDateISO(iso) {
+        if (!iso) return "—";
+        try {
+            // Accepts YYYY-MM-DD or full ISO string
+            const d = new Date(iso);
+            if (Number.isNaN(d.getTime())) return iso;
+            return d.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
+        } catch {
+            return iso;
+        }
+    }
+
+    function formatScheduleReadable(sub) {
+        const type = (sub?.schedule_type || "").toLowerCase();
+        const meta = safeParseMeta(sub?.schedule_meta);
+
+        if (type === "one-time" || type === "one_time" || type === "onetime") {
+            const date = meta?.date || meta?.start_date || sub?.next_delivery_date;
+            return `One-time — ${formatDateISO(date)}`;
+        }
+
+        if (type === "daily") {
+            const start = meta?.start_date || sub?.next_delivery_date;
+            const every = (meta?.every_n_days ?? meta?.every) || 1;
+            return `Daily — starts ${formatDateISO(start)} • every ${every} day${Number(every) > 1 ? "s" : ""}`;
+        }
+
+        if (type === "weekly") {
+            const start = meta?.start_date || sub?.next_delivery_date;
+            const days = Array.isArray(meta?.days) ? meta.days : [];
+            // nice labels map
+            const LABEL = { mon: "Mon", tue: "Tue", wed: "Wed", thu: "Thu", fri: "Fri", sat: "Sat", sun: "Sun" };
+            const daysLabel = days.map(d => (LABEL[d] || d)).join(", ");
+            return `Weekly — starts ${formatDateISO(start)}${daysLabel ? ` • ${daysLabel}` : ""}`;
+        }
+        return `${sub?.schedule_type || "Schedule"} ${sub?.schedule_meta ? "" : ""}`;
+    }
+
     return (
         <div className="page-shell">
             <h2 className="page-title">My Account</h2>
@@ -149,57 +208,65 @@ function Profile() {
                 </form>
             </div>
 
-            <h2 className="page-title" style={{ marginTop: 28 }}>Active Subscriptions</h2>
-
+            <h2 className="mb-1" >Active Subscriptions</h2>
             <div>
-                {subscriptions.filter(s => s.is_active).length === 0 ? (
-                    <div className="empty">No active subscriptions.
-                        <button className="primary" onClick={() => navigate("/products")}>Browse products</button>
-                    </div>
-                ) : subscriptions.filter(sub => sub.is_active).map(sub => (
-                    <div className="card sub-card" key={sub.id}>
-                        <div className="sub-grid">
-
-                            <div>
-                                <div className="muted-label">Name</div>
-                                <div className="muted-value">{sub.product_name}</div>
-
-                                <div className="muted-label">Delivery Address</div>
-                                <div className="muted-value">{profile.delivery_address || <em>—</em>}</div>
+                {(() => {
+                    const activeSubs = subscriptions.filter(s => s.is_active);
+                    if (activeSubs.length === 0) {
+                        return (
+                            <div className="empty">
+                                No active subscriptions.
+                                <button className="primary" onClick={() => navigate("/products")}>Browse products</button>
                             </div>
+                        );
+                    }
 
-                            <div>
-                                <div className="muted-label">Phone</div>
-                                <div className="muted-value">{profile.phone || <em>—</em>}</div>
+                    return activeSubs.map(sub => {
+                        const scheduleText = formatScheduleReadable(sub);
+                        const nextDelivery = formatDateISO(sub.next_delivery_date);
 
-                                <div className="muted-label">Email</div>
-                                <div className="muted-value">{user.email}</div>
-                            </div>
+                        return (
+                            <div className="card sub-card" key={sub.id}>
+                                <div className="sub-grid">
+                                    <div>
+                                        <div className="muted-label">Name</div>
+                                        <div className="muted-value">{sub.product_name}</div>
 
-                            <div className="sub-meta">
-                                <div className="muted-label">Schedule</div>
-                                <div className="muted-value">
-                                    {sub.schedule_type} {sub.schedule_meta ? JSON.stringify(sub.schedule_meta) : ""}
+                                        <div className="muted-label">Delivery Address</div>
+                                        <div className="muted-value">{profile.delivery_address || <em>—</em>}</div>
+                                    </div>
+
+                                    <div>
+                                        <div className="muted-label">Phone</div>
+                                        <div className="muted-value">{profile.phone || <em>—</em>}</div>
+
+                                        <div className="muted-label">Email</div>
+                                        <div className="muted-value">{user.email}</div>
+                                    </div>
+
+                                    <div className="sub-meta">
+                                        <div className="muted-label">Schedule</div>
+                                        <div className="muted-value">{scheduleText}</div>
+
+                                        <div className="muted-label">Next Delivery</div>
+                                        <div className="muted-value">{nextDelivery}</div>
+
+                                        <button
+                                            className="secondary"
+                                            onClick={() => handleCancel(sub.id)}
+                                            style={{ marginTop: "10px" }}
+                                        >
+                                            Cancel Delivery
+                                        </button>
+                                    </div>
                                 </div>
-
-                                <div className="muted-label">Next Delivery</div>
-                                <div className="muted-value">{sub.next_delivery_date || "—"}</div>
-
-                                {/* CANCEL BUTTON */}
-                                <button
-                                    className="secondary"
-                                    onClick={() => handleCancel(sub.id)}
-                                    style={{ marginTop: "10px" }}
-                                >
-                                    Cancel Delivery
-                                </button>
                             </div>
-
-                        </div>
-                    </div>
-
-                ))}
+                        );
+                    });
+                })()}
             </div>
+
+            <h2 className="mb-1" >Order History</h2>
 
             <div>
                 {orders.length === 0 ? (

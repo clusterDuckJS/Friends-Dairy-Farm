@@ -12,6 +12,7 @@ import Profile from './Pages/Profile/Profile'
 import { supabase } from './utils/supabaseClient'
 import PrivateRoute from './Components/PrivateRoute'
 import AdminDashboardPage from './Pages/AdminDashboard/AdminDashboard'
+import WhatsAppFab from './Components/WhatsAppFab/WhatsAppFab'
 
 
 function App() {
@@ -35,7 +36,9 @@ function App() {
           </PrivateRoute>} />
         <Route path="/login" element={<Login />} />
         <Route path="/admin" element={<AdminDashboardPage />} />
+        
       </Routes>
+      <WhatsAppFab phone="447424343937" message="Hello! Can I get more info on this?" />
       {!hideFooter && <Footer />}
 
     </>

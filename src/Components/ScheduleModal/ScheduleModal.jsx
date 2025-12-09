@@ -2,7 +2,8 @@
 import React, { useState } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import { createSubscription } from "../../utils/subscription";
-import { computeNextDeliveryDate } from "../../utils/scheduleUtils";
+import { computeNextDeliveryDate } from "../../utils/schedule";
+import { useToast } from "../../Context/ToastContext";
 
 /*
 Props:
@@ -11,6 +12,7 @@ Props:
 */
 export default function ScheduleModal({ onClose, onCreated }) {
   const user = useAuth();
+  const toast = useToast();
 
   // form fields
   const [productName, setProductName] = useState("Whole Milk (1L)");
@@ -64,8 +66,8 @@ export default function ScheduleModal({ onClose, onCreated }) {
 
   async function handleCreate() {
     const err = validate();
-    if (err) return alert(err);
-    if (!user) return alert("You must be logged in");
+    if (err) return toast.error(err);
+    if (!user) return toast.error("You must be logged in");
 
     const schedule_meta = (scheduleType === "one-time") ? { date: oneTimeDate } :
                           (scheduleType === "daily") ? { start_date: dailyStart, every_n_days: Number(dailyEvery) } :
@@ -89,7 +91,7 @@ export default function ScheduleModal({ onClose, onCreated }) {
       onClose && onClose();
     } catch (e) {
       console.error("create subscription failed", e);
-      alert("Failed to create subscription: " + (e?.message || e));
+      toast.error("Failed to create subscription: " + (e?.message || e));
     } finally {
       setLoading(false);
     }

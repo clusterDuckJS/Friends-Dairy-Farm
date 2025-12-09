@@ -4,9 +4,11 @@ import { useNavigate } from "react-router-dom";
 import { signUpUser, loginUser } from "../../utils/auth";
 import "./login.css";
 import LOGO from '../../assets/logo.webp'
+import { useToast } from "../../Context/ToastContext";
 
 export default function Login() {
   const [tab, setTab] = useState("login");
+  const toast = useToast();
 
   // login state
   const [loginEmail, setLoginEmail] = useState("");
@@ -25,7 +27,7 @@ export default function Login() {
   async function handleLogin(e) {
     e.preventDefault();
     if (!loginEmail || !loginPassword) {
-      return alert("Enter both email and password.");
+      return toast.error("Enter both email and password.");
     }
 
     setLoading(true);
@@ -35,7 +37,7 @@ export default function Login() {
       navigate("/products");
     } catch (err) {
       // show clearer message if available
-      alert(err?.message || "Login failed");
+      toast.error(err?.message || "Login failed");
     } finally {
       setLoading(false);
     }
@@ -44,10 +46,10 @@ export default function Login() {
   async function handleSignup(e) {
     e.preventDefault();
     if (!signupName || !signupEmail || !signupPassword) {
-      return alert("Name, email and password are required.");
+      return toast.error("Name, email and password are required.");
     }
     if (signupPassword !== signupConfirm) {
-      return alert("Passwords do not match.");
+      return toast.error("Passwords do not match.");
     }
 
     setLoading(true);
@@ -59,7 +61,7 @@ export default function Login() {
         phone: signupPhone.trim(),
       });
 
-      alert(
+      toast.success(
         "Account created. If email confirmation is enabled, check your inbox. Now switch to Login."
       );
 
@@ -71,7 +73,7 @@ export default function Login() {
       setSignupConfirm("");
       setTab("login");
     } catch (err) {
-      alert(err?.message || "Signup failed");
+      toast.error(err?.message || "Signup failed");
     } finally {
       setLoading(false);
     }

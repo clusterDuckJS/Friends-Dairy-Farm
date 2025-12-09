@@ -3,9 +3,11 @@ import ReactDOM from "react-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { createOrder } from "../../utils/orders";
 import { createSubscription } from "../../utils/subscription";
-import { computeNextDeliveryDate } from "../../utils/scheduleUtils"; // if you use recurring logic
+// import { computeNextDeliveryDate } from "../../utils/schedule"; // if you use recurring logic
 import { useCart } from "../../Context/CartContext";
 import { LuX } from "react-icons/lu";
+import { useToast } from "../../Context/ToastContext";
+import { computeNextDeliveryDate } from "../../utils/schedule";
 
 export default function CartModal({ open, onClose, onCompleted }) {
   const { items, total, clearCart } = useCart();
@@ -19,18 +21,28 @@ export default function CartModal({ open, onClose, onCompleted }) {
   const [weeklyStart, setWeeklyStart] = useState("");
   const [weeklyDays, setWeeklyDays] = useState([]);
   const [loading, setLoading] = useState(false);
+  const toast = useToast();
 
   if (!open) return null;
 
   async function handlePlace() {
-    if (!user) return alert("Please login first");
+    if (!user) {
+      toast.error("Please login first");
+      return;
+    }
 
-    if (items.length === 0) return alert("Cart is empty");
+    if (items.length === 0) {
+      toast.error("Cart is empty");
+      return;
+    }
     setLoading(true);
 
     try {
       if (mode === "one-time") {
-        if (!oneTimeDate) return alert("Pick a delivery date");
+        if (!oneTimeDate) {
+          toast.error("Pick a delivery date");
+          return;
+        }
         // create order
         await createOrder({
           userId: user.id,
@@ -43,17 +55,23 @@ export default function CartModal({ open, onClose, onCompleted }) {
         clearCart();
         onCompleted && onCompleted();
         onClose();
-        alert("Order placed. Pay in person on delivery.");
+        toast.success("Order placed. Pay in person on delivery.");
         return;
       }
 
       // recurring flow: create subscription
       let schedule_meta = null;
       if (recurringType === "daily") {
-        if (!dailyStart) return alert("Pick start date");
+        if (!dailyStart) {
+          toast.error("Pick start date");
+          return;
+        }
         schedule_meta = { start_date: dailyStart, every_n_days: Number(dailyEvery || 1) };
       } else {
-        if (!weeklyStart || !weeklyDays.length) return alert("Pick start date and days");
+        if (!weeklyStart || !weeklyDays.length) {
+          toast.error("Pick start date and days");
+          return;
+        }
         schedule_meta = { start_date: weeklyStart, days: weeklyDays };
       }
 
@@ -74,10 +92,10 @@ export default function CartModal({ open, onClose, onCompleted }) {
       clearCart();
       onCompleted && onCompleted();
       onClose();
-      alert("Recurring subscription created.");
+      toast.success("Recurring subscription created.");
     } catch (err) {
       console.error("place error:", err);
-      alert("Failed to place order/subscription: " + (err?.message || err));
+      toast.error("Failed to place order/subscription: " + (err?.message || err));
     } finally {
       setLoading(false);
     }
@@ -133,8 +151,8 @@ export default function CartModal({ open, onClose, onCompleted }) {
                   <label >Start date</label>
                   <input type="date" value={dailyStart} onChange={e => setDailyStart(e.target.value)} />
                 </div>
-                <label className="btn-container" >Deliver every
-                  <input type="number" min="1" value={dailyEvery} onChange={e => setDailyEvery(e.target.value)} />
+                <label name='delivery-day' className="btn-container mb-1" >Deliver every
+                  <input name='delivery-day' type="number" min="1" value={dailyEvery} onChange={e => setDailyEvery(e.target.value)} />
                   days</label>
               </>
 

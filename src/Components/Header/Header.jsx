@@ -8,6 +8,7 @@ import { useCart } from '../../Context/CartContext';
 import CartModal from '../Modal/CartModal';
 import useIsAdmin from "../../hooks/useIsAdmin";
 import { useAuth } from '../../hooks/useAuth';
+import { useToast } from '../../Context/ToastContext';
 
 function Header() {
   const [open, setOpen] = useState(false);
@@ -16,6 +17,9 @@ function Header() {
   const { items } = useCart();
   const { isAdmin, isLoading } = useIsAdmin();
   const user = useAuth();
+  const fullName = user?.user_metadata?.full_name || "";
+  const firstName = fullName.split(" ")[0];
+  const toast = useToast();
 
   async function handleLogout() {
     try {
@@ -26,7 +30,7 @@ function Header() {
     } catch (err) {
       // show the real error in console and to user
       console.error("Logout error:", err);
-      alert("Logout failed: " + (err?.message || JSON.stringify(err)));
+      toast.error("Logout failed: " + (err?.message || JSON.stringify(err)));
       // fallback: redirect to login anyway so user isn't stuck
       navigate("/login");
     }
@@ -36,7 +40,11 @@ function Header() {
   return (
     <>
       <header className="header">
-        <img src={LOGO} alt="logo" className="logo" />
+        <div className="logo-wrapper flex align-center gap-1 pointer" onClick={() => navigate("/")}>
+          <img src={LOGO} alt="logo" className="logo" />
+          <p className='bold'>Friends Dairy Farm</p>
+        </div>
+
 
         {/* Desktop nav */}
         <nav className="nav-desktop">
@@ -76,6 +84,7 @@ function Header() {
           {/* IF LOGGED IN */}
           {user && (
             <div className='account-cart-wrapper flex align-center gap-2'>
+              <p className='color-primary' onClick={() => navigate("/profile")}>Hello, {firstName}</p>
               <div className="shopping-cart-wrapper flex align-center">
                 <LuShoppingCart onClick={() => setShowCart(true)} />
                 <span className="badge">{items.length}</span>

@@ -1,61 +1,36 @@
 // src/utils/scheduleUtils.js
-/**
- * computeNextDeliveryDate(scheduleType, scheduleMeta)
- * - scheduleType: "one-time" | "daily" | "weekly"
- * - scheduleMeta:
- *    one-time: { date: "YYYY-MM-DD" }
- *    daily:    { start_date: "YYYY-MM-DD", every_n_days: 1 }
- *    weekly:   { start_date: "YYYY-MM-DD", days: ["mon","wed","fri"] }
- *
- * Returns: "YYYY-MM-DD" or null
- */
+import { formatDateOnly } from "./date";
 
-const DAY_MAP = { sun: 0, mon: 1, tue: 2, wed: 3, thu: 4, fri: 5, sat: 6 };
-
-function isoDate(d) {
-  return d.toISOString().slice(0, 10);
+function safeParseMeta(m) {
+  if (!m) return {};
+  if (typeof m === "object") return m;
+  try { return JSON.parse(m); } catch { return {}; }
 }
 
-export function computeNextDeliveryDate(scheduleType, scheduleMeta = {}) {
-  const today = new Date();
-  if (scheduleType === "one-time") {
-    return scheduleMeta?.date || null;
+export function formatScheduleReadable(item) {
+  const type = (item?.schedule_type || "").toLowerCase();
+  const meta = safeParseMeta(item?.schedule_meta);
+  if (type === "one-time" || type === "one_time" || type === "onetime") {
+    const date = meta?.date || meta?.start_date || item?.next_delivery_date;
+    return `One-time — ${formatDateOnly(date)}`;
   }
-
-  if (scheduleType === "daily") {
-    const start = scheduleMeta?.start_date ? new Date(scheduleMeta.start_date) : today;
-    const every = Number(scheduleMeta?.every_n_days ?? 1);
-    // if start is today or earlier -> next = start (if >= today) else compute forward to >= today
-    let candidate = new Date(start);
-    candidate.setHours(0,0,0,0);
-    const now = new Date(today); now.setHours(0,0,0,0);
-    if (candidate >= now) return isoDate(candidate);
-
-    // advance by multiples of 'every' until >= today (safety cap 365 iterations)
-    for (let i = 0; i < 365; i++) {
-      candidate.setDate(candidate.getDate() + every);
-      if (candidate >= now) return isoDate(candidate);
-    }
-    return isoDate(candidate);
+  if (type === "daily") {
+    const start = meta?.start_date || item?.next_delivery_date;
+    const every = meta?.every_n_days ?? meta?.every ?? 1;
+    return `Daily — starts ${formatDateOnly(start)} • every ${every} day${Number(every) > 1 ? "s" : ""}`;
   }
-
-  if (scheduleType === "weekly") {
-    const start = scheduleMeta?.start_date ? new Date(scheduleMeta.start_date) : today;
-    let days = Array.isArray(scheduleMeta?.days) ? scheduleMeta.days : [];
-    if (days.length === 0) return isoDate(start);
-
-    const selectedIdxs = days.map(d => DAY_MAP[d]).filter(v => typeof v === "number");
-    // search next 28 days for first matching weekday >= start
-    let candidate = new Date(start);
-    candidate.setHours(0,0,0,0);
-    for (let offset = 0; offset < 28; offset++) {
-      const c = new Date(candidate);
-      c.setDate(candidate.getDate() + offset);
-      if (selectedIdxs.includes(c.getDay())) return isoDate(c);
-    }
-    // fallback
-    return isoDate(candidate);
+  if (type === "weekly") {
+    const start = meta?.start_date || item?.next_delivery_date;
+    const rawDays = Array.isArray(meta?.days) ? meta.days : (meta?.weekdays || []);
+    const LABEL = { mon: "Mon", tue: "Tue", wed: "Wed", thu: "Thu", fri: "Fri", sat: "Sat", sun: "Sun" };
+    const days = rawDays.map(d => {
+      if (!d) return null;
+      const s = String(d).toLowerCase().slice(0,3);
+      return LABEL[s] || String(d);
+    }).filter(Boolean);
+    const daysLabel = days.length ? ` • ${days.join(", ")}` : "";
+    return `Weekly — starts ${formatDateOnly(start)}${daysLabel}`;
   }
-
-  return null;
+  const fallbackDate = safeParseMeta(item?.schedule_meta)?.start_date || item?.next_delivery_date;
+  return `${item?.schedule_type || "Schedule"}${fallbackDate ? ` — ${formatDateOnly(fallbackDate)}` : ""}`;
 }

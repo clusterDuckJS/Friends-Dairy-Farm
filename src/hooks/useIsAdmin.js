@@ -12,9 +12,7 @@ export default function useIsAdmin() {
     async function check() {
       setIsLoading(true);
       try {
-        // Supabase v2: getUser() returns { data: { user } }
         const { data: userData, error: userError } = await supabase.auth.getUser();
-
         if (userError || !userData?.user) {
           if (mounted) {
             setIsAdmin(false);
@@ -22,10 +20,8 @@ export default function useIsAdmin() {
           }
           return;
         }
-
         const userId = userData.user.id;
 
-        // Fetch the profile row's is_admin flag
         const { data: profile, error: profileError } = await supabase
           .from("profiles")
           .select("is_admin")
@@ -46,10 +42,20 @@ export default function useIsAdmin() {
       }
     }
 
+    // run once on mount
     check();
+
+    // subscribe to auth changes so we re-run check when user signs in/out
+    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+      // events: SIGNED_IN, SIGNED_OUT, TOKEN_REFRESH, USER_UPDATED, etc.
+      // re-check admin status (debounce tiny bit if racey)
+      check();
+    });
 
     return () => {
       mounted = false;
+      // cleanup subscription
+      try { sub?.subscription?.unsubscribe(); } catch (e) { /* ignore */ }
     };
   }, []);
 

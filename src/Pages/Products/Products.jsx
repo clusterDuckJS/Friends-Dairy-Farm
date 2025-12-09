@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom'
 import { useCart } from '../../Context/CartContext'
 import ProductCard from '../../Components/ProductCard/ProductCard'
 import { getProducts } from '../../utils/products'
+import Logo from '../../assets/logo.webp'
 
 function Products() {
   const navigate = useNavigate();
@@ -37,6 +38,7 @@ function Products() {
   return (
     <div className="main-container products">
       <section className="intro flex-column align-center">
+        <img src={Logo} className='logo-section' alt="Friends Dairy Farm Logo" />
         <h1 className='center bold mb-1'>Our Products</h1>
         <p className='center'>Premium quality dairy products, handcrafted with care and delivered fresh daily</p>
       </section>
