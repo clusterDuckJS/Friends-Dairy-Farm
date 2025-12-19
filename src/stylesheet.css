@@ -55,6 +55,29 @@ section {
   border-radius: 1.2rem;
 }
 
+/* ========================= */
+.tag-btn {
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid gainsboro;
+  cursor: pointer;
+  user-select: none;
+  font-size: 14px;
+  transition: all 0.15s ease;
+  background: #fff;
+}
+
+.tag-btn:hover {
+  border-color: #aaa;
+}
+
+.tag-btn--active {
+  background: var(--color-primary);
+  color: #fff;
+  border-color: gainsboro;
+}
+/* =========================== */
+
 .badge {
   background-color: var(--color-error);
   color: white;
@@ -253,7 +276,7 @@ button.secondary {
   display: flex;
 }
 
-.flex-column {
+.flex-column { 
   display: flex;
   flex-direction: column;
 }
@@ -278,6 +301,9 @@ button.secondary {
   align-items: flex-start;
 }
 
+.wrap{
+  flex-wrap: wrap;
+}
 .gap-05 {
   gap: 0.5rem;
 }

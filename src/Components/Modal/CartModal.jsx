@@ -1,17 +1,21 @@
 import React, { useState } from "react";
 import ReactDOM from "react-dom";
 import { useAuth } from "../../hooks/useAuth";
+import "./modal.css";
 import { createOrder } from "../../utils/orders";
 import { createSubscription } from "../../utils/subscription";
 // import { computeNextDeliveryDate } from "../../utils/schedule"; // if you use recurring logic
 import { useCart } from "../../Context/CartContext";
-import { LuX } from "react-icons/lu";
+import { LuMinus, LuPlus, LuTrash2, LuX } from "react-icons/lu";
 import { useToast } from "../../Context/ToastContext";
 import { computeNextDeliveryDate } from "../../utils/schedule";
+import { useNavigate } from "react-router-dom";
 
 export default function CartModal({ open, onClose, onCompleted }) {
-  const { items, total, clearCart } = useCart();
+  const { items, total, clearCart, removeFromCart, setQty } = useCart();
+
   const user = useAuth();
+  const navigate = useNavigate();
 
   const [mode, setMode] = useState("one-time"); // 'one-time' | 'recurring'
   const [oneTimeDate, setOneTimeDate] = useState("");
@@ -107,77 +111,148 @@ export default function CartModal({ open, onClose, onCompleted }) {
         <div className="heading-wrapper flex space-btw mb-1">
           <h3>Cart</h3>
           <LuX className="pointer" onClick={onClose} />
-        </div> 
-
-        <div style={{ maxHeight: 320, overflow: "auto" }}>
-          {items.map(it => (
-            <div key={it.id} className="flex space-btw mb-05">
-              <div>
-                <div style={{ fontWeight: 700 }}>{it.name}</div>
-                <div>Qty: {it.qty}</div>
-              </div>
-              <div>₹{(Number(it.price || 0) * Number(it.qty || 1)).toFixed(2)}</div>
-            </div>
-          ))}
         </div>
 
-        <p className="bold mb-1 mt-1 total-value">Total: ₹{total.toFixed(2)}</p>
+        {/* EMPTY CART STATE */}
+        {items.length === 0 && (
+          <div className="mb-1">
+            <p className="mb-05">Your cart is empty 🛒</p>
+            <p className="mb-05">
+              Looks like you haven’t added anything yet.
+            </p>
 
-        <div className="btn-container mb-1">
-          <label><input type="radio" checked={mode === "one-time"} onChange={() => setMode("one-time")} /> One-time order</label>
-          <label><input type="radio" checked={mode === "recurring"} onChange={() => setMode("recurring")} /> Recurring subscription</label>
-        </div>
-
-        {mode === "one-time" && (
-          <div className="btn-container mb-1">
-            <label className="bold">Delivery date: </label>
-            <input type="date" className="input" value={oneTimeDate} onChange={e => setOneTimeDate(e.target.value)} />
+            <button
+              className="primary"
+              onClick={() => {
+                onClose();
+                navigate('/products'); // adjust route if needed
+              }}
+            >
+              Browse Products
+            </button>
           </div>
         )}
 
-        {mode === "recurring" && (
+        {items.length > 0 && (
           <>
-            <div className="btn-container mb-05">
-              <label>Recurring type: </label>
-              <select value={recurringType} onChange={e => setRecurringType(e.target.value)}>
-                <option value="daily">Daily</option>
-                <option value="weekly">Weekly</option>
-              </select>
+            <div style={{ maxHeight: 320, overflow: "auto" }}>
+              {items.map(it => (
+                <div key={it.id} className="cart-item flex space-btw align-center mb-05">
+                  <div>
+                    <div style={{ fontWeight: 700 }}>{it.name}</div>
+
+                    <div className="flex align-center gap-05 mt-05">
+                      <button
+                        className="qty-btn"
+                        onClick={() => {
+                          const next = it.qty - 1;
+                          next <= 0 ? removeFromCart(it.id) : setQty(it.id, next);
+                        }}
+                      >
+                        <LuMinus size={14} />
+                      </button>
+
+                      <span className="qty-value">{it.qty}</span>
+
+                      <button
+                        className="qty-btn"
+                        onClick={() => setQty(it.id, it.qty + 1)}
+                      >
+                        <LuPlus size={14} />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="flex align-center gap-05">
+                    <div className="bold">
+                      ₹{(Number(it.price || 0) * it.qty).toFixed(2)}
+                    </div>
+
+                    <LuTrash2
+                      className="cart-remove pointer"
+                      onClick={() => removeFromCart(it.id)}
+                    />
+                  </div>
+                </div>
+              ))}
             </div>
 
-            {recurringType === "daily" && (
+            <p className="bold mb-1 mt-1 total-value">Total: ₹{total.toFixed(2)}</p>
+
+            <div className="btn-container mb-1">
+              <label><input type="radio" checked={mode === "one-time"} onChange={() => setMode("one-time")} /> One-time order</label>
+              <label><input type="radio" checked={mode === "recurring"} onChange={() => setMode("recurring")} /> Recurring subscription</label>
+            </div>
+
+            {mode === "one-time" && (
+              <div className="btn-container mb-1">
+                <label className="bold">Delivery date: </label>
+                <input type="date" className="input" value={oneTimeDate} onChange={e => setOneTimeDate(e.target.value)} />
+              </div>
+            )}
+
+            {mode === "recurring" && (
               <>
                 <div className="btn-container mb-05">
-                  <label >Start date</label>
-                  <input type="date" value={dailyStart} onChange={e => setDailyStart(e.target.value)} />
+                  <label>Recurring type: </label>
+                  <select value={recurringType} onChange={e => setRecurringType(e.target.value)}>
+                    <option value="daily">Daily</option>
+                    <option value="weekly">Weekly</option>
+                  </select>
                 </div>
-                <label name='delivery-day' className="btn-container mb-1" >Deliver every
-                  <input name='delivery-day' type="number" min="1" value={dailyEvery} onChange={e => setDailyEvery(e.target.value)} />
-                  days</label>
+
+                {recurringType === "daily" && (
+                  <>
+                    <div className="btn-container mb-05">
+                      <label >Start date</label>
+                      <input type="date" value={dailyStart} onChange={e => setDailyStart(e.target.value)} />
+                    </div>
+                    <label name='delivery-day' className="btn-container mb-1" >Deliver every
+                      <input name='delivery-day' type="number" min="1" value={dailyEvery} onChange={e => setDailyEvery(e.target.value)} />
+                      days</label>
+                  </>
+
+                )}
+
+                {recurringType === "weekly" && (
+                  <>
+                  <div className="btn-container mb-05">
+                    <label >Start date</label>
+                    <input type="date" className="input mb-1" value={weeklyStart} onChange={e => setWeeklyStart(e.target.value)} />
+                  </div>
+                    <div className="flex space-btw wrap gap-05 mb-1">
+                      <label >Deliver on: </label>
+                      <div className="flex wrap gap-05">
+                        {["mon", "tue", "wed", "thu", "fri", "sat", "sun"].map(d => {
+                          const selected = weeklyDays.includes(d);
+
+                          return (
+                            <div
+                              key={d}
+                              className={`tag-btn ${selected ? "tag-btn--active" : ""}`}
+                              onClick={() => {
+                                setWeeklyDays(prev =>
+                                  selected ? prev.filter(x => x !== d) : [...prev, d]
+                                );
+                              }}
+                            >
+                              {d}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </>
+                )}
               </>
-
             )}
+            <button className="primary" onClick={handlePlace} disabled={loading}>{loading ? "Placing..." : (mode === "one-time" ? "Place Order" : "Create Subscription")}</button>
 
-            {recurringType === "weekly" && (
-              <>
-                <label >Start date</label>
-                <input type="date" className="input" value={weeklyStart} onChange={e => setWeeklyStart(e.target.value)} />
-                <label >Days</label>
-                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                  {["mon", "tue", "wed", "thu", "fri", "sat", "sun"].map(d => (
-                    <button key={d} type="button" className="pill" onClick={() => {
-                      setWeeklyDays(prev => prev.includes(d) ? prev.filter(x => x !== d) : [...prev, d]);
-                    }}>{d}</button>
-                  ))}
-                </div>
-              </>
-            )}
-          </>
-        )}
-        <button className="primary" onClick={handlePlace} disabled={loading}>{loading ? "Placing..." : (mode === "one-time" ? "Place Order" : "Create Subscription")}</button>
-
+          </>)}
       </div>
     </div>,
+
+
     document.body
   );
 }

@@ -24,7 +24,7 @@ function Footer() {
           <p className="bold mb-1">Contact Us</p>
           <ul>
             <li className='flex align-center gap-05 mb-05'><LuMapPin />Friends Dairy Farm, Chennai, Tamil Nadu</li>
-            <li className='flex align-center gap-05 mb-05'><LuPhone />+91 98765 43210</li>
+            <li className='flex align-center gap-05 mb-05'><LuPhone />+91 97900 09985</li>
             <li className='flex align-center gap-05 '><LuMail />fdfchennai@gmail.com</li>
           </ul>
         </div>

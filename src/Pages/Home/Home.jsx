@@ -93,7 +93,7 @@ function Home() {
                         </div>
                     </div>
                 </div>
-                <button className='primary'>View All Products <LuArrowRight/></button>
+                <button className='primary' onClick={() => navigate('/products')}>View All Products <LuArrowRight/></button>
             </section>
 
             {/* Review */}
@@ -128,7 +128,7 @@ function Home() {
                         <p className='italic mb-1'>"Best ghee I've ever tasted. Authentic traditional flavor that reminds me of my grandmother's cooking."</p>
                         <div className="text-wrapper">
                             <p className='bold'>Rajesh Kumar</p>
-                            <small>T Nagar, Chennai</small>
+                            <small>Nanganallur, Chennai</small>
                         </div>
                     </div>
 
@@ -143,7 +143,7 @@ function Home() {
                         <p className='italic mb-1'>"Very reliable service. The recurring delivery option is so convenient. Highly recommended!"</p>
                         <div className="text-wrapper">
                             <p className='bold'>Lakshmi Venkat</p>
-                            <small>Adyar, Chennai</small>
+                            <small>Airport Quarters, Chennai</small>
                         </div>
                     </div>
                 </div>

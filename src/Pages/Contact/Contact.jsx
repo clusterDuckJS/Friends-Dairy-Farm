@@ -1,9 +1,37 @@
-import React from 'react'
+import { useRef, useState } from "react";
 import './contact.css'
+import emailjs from "@emailjs/browser";
 import Logo from '../../assets/logo.webp'
 import { LuClock, LuMail, LuMapPin, LuPhone } from 'react-icons/lu'
 
 function Contact() {
+    const formRef = useRef();
+    const [status, setStatus] = useState("");
+    const [loading, setLoading] = useState(false);
+
+    function sendEmail(e) {
+        e.preventDefault();
+        setLoading(true);
+        setStatus("");
+
+        emailjs.sendForm(
+            import.meta.env.VITE_EMAILJS_SERVICE_ID,
+            import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+            formRef.current,
+            import.meta.env.VITE_EMAILJS_PUBLIC_KEY
+        )
+            .then(() => {
+                setStatus("Message sent successfully ✅");
+                formRef.current.reset();
+            })
+            .catch((err) => {
+                console.error(err);
+                setStatus("Failed to send message. Please try again.");
+            })
+            .finally(() => setLoading(false));
+    }
+
+
     return (
         <div className='main-container contact'>
             <section className="intro flex-column align-center bg-light">
@@ -24,7 +52,7 @@ function Contact() {
                             </div>
                             <div className="contact-text-wrapper">
                                 <p className='bold'>Phone</p>
-                                <p>+91 98765 43210</p>
+                                <p>+91 97900 09985</p>
                                 <p>Mon-Sat, 6:00 AM - 8:00 PM</p>
                             </div>
                         </div>
@@ -64,8 +92,12 @@ function Contact() {
 
                 <div className="card form-container">
                     <h2 className='bold mb-2'>Send Us a Message</h2>
-                    {/* <form className="contact-form" onSubmit={sendEmail}> */}
-                    <form className="contact-form" >
+                    {/* <form className="contact-form" > */}
+                    <form
+                        ref={formRef}
+                        className="contact-form"
+                        onSubmit={sendEmail}
+                    >
                         <div className="form-row">
                             <div className="form-field">
                                 <label htmlFor="firstName">First Name</label>
@@ -102,11 +134,11 @@ function Contact() {
                             <textarea name="message" id="message" rows="4" placeholder="Write your message here..." required />
                         </div>
 
-                        <button type="submit" className="primary">
-                            Send Message
+                        <button type="submit" className="primary" disabled={loading}>
+                            {loading ? "Sending..." : "Send Message"}
                         </button>
 
-                        {/* {status && <p className="form-status">{status}</p>} */}
+                        {status && <p className="form-status">{status}</p>}
                     </form>
                 </div>
 

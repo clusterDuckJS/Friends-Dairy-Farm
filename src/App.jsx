@@ -16,8 +16,8 @@ import WhatsAppFab from './Components/WhatsAppFab/WhatsAppFab'
 
 
 function App() {
-  supabase.auth.getSession().then(console.log);
-  console.count('rendered')
+  // supabase.auth.getSession().then(console.log);
+  // console.count('rendered')
   const location = useLocation();
   const hideFooter = location.pathname === "/login";
   return (
@@ -38,7 +38,7 @@ function App() {
         <Route path="/admin" element={<AdminDashboardPage />} />
         
       </Routes>
-      <WhatsAppFab phone="447424343937" message="Hello! Can I get more info on this?" />
+      <WhatsAppFab phone="919790009985" message="Hello! Can I get more info on this?" />
       {!hideFooter && <Footer />}
 
     </>

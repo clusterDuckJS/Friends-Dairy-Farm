@@ -17,6 +17,8 @@ import IMG13 from '../../assets/gallery/WA00013.jpg'
 import IMG14 from '../../assets/gallery/WA00014.jpg'
 import IMG15 from '../../assets/gallery/WA00015.jpg'
 import IMG16 from '../../assets/gallery/WA00016.jpg'
+import IMG17 from '../../assets/gallery/WA00017.jpeg'
+
 
 
 
@@ -46,6 +48,7 @@ function Gallery() {
                     <img src={IMG14} alt="" />
                     <img src={IMG15} alt="" />
                     <img src={IMG16} alt="" />
+                    <img src={IMG17} alt="" />
                 </div>
             </section>
         </div>

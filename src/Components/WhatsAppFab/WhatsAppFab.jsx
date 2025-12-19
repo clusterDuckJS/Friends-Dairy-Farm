@@ -2,7 +2,7 @@
 import React from "react";
 
 export default function WhatsAppFab({
-  phone = "447424343937",           // international, no + or spaces
+  phone = "919790009985",           // international, no + or spaces
   message = "Hi there!",            // default message
   size = 56,                        // button diameter in px
   right = 18,
