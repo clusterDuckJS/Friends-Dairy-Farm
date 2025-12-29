@@ -13,11 +13,15 @@ import { useNavigate } from "react-router-dom";
 
 export default function CartModal({ open, onClose, onCompleted }) {
   const { items, total, clearCart, removeFromCart, setQty } = useCart();
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const minDate = tomorrow.toISOString().split("T")[0];
+
 
   const user = useAuth();
   const navigate = useNavigate();
 
-  const [mode, setMode] = useState("one-time"); // 'one-time' | 'recurring'
+  const [mode, setMode] = useState("recurring"); // 'one-time' | 'recurring'
   const [oneTimeDate, setOneTimeDate] = useState("");
   const [recurringType, setRecurringType] = useState("daily"); // daily|weekly
   const [dailyStart, setDailyStart] = useState("");
@@ -139,7 +143,7 @@ export default function CartModal({ open, onClose, onCompleted }) {
               {items.map(it => (
                 <div key={it.id} className="cart-item flex space-btw align-center mb-05">
                   <div>
-                    <div style={{ fontWeight: 700 }}>{it.name}</div>
+                    <div className="mb-05" style={{ fontWeight: 700 }}>{it.name}</div>
 
                     <div className="flex align-center gap-05 mt-05">
                       <button
@@ -187,7 +191,14 @@ export default function CartModal({ open, onClose, onCompleted }) {
             {mode === "one-time" && (
               <div className="btn-container mb-1">
                 <label className="bold">Delivery date: </label>
-                <input type="date" className="input" value={oneTimeDate} onChange={e => setOneTimeDate(e.target.value)} />
+                <input
+                  type="date"
+                  className="input"
+                  min={minDate}
+                  value={oneTimeDate}
+                  onChange={e => setOneTimeDate(e.target.value)}
+                />
+
               </div>
             )}
 
@@ -205,7 +216,13 @@ export default function CartModal({ open, onClose, onCompleted }) {
                   <>
                     <div className="btn-container mb-05">
                       <label >Start date</label>
-                      <input type="date" value={dailyStart} onChange={e => setDailyStart(e.target.value)} />
+                      <input
+                        type="date"
+                        min={minDate}
+                        value={dailyStart}
+                        onChange={e => setDailyStart(e.target.value)}
+                      />
+
                     </div>
                     <label name='delivery-day' className="btn-container mb-1" >Deliver every
                       <input name='delivery-day' type="number" min="1" value={dailyEvery} onChange={e => setDailyEvery(e.target.value)} />
@@ -216,10 +233,17 @@ export default function CartModal({ open, onClose, onCompleted }) {
 
                 {recurringType === "weekly" && (
                   <>
-                  <div className="btn-container mb-05">
-                    <label >Start date</label>
-                    <input type="date" className="input mb-1" value={weeklyStart} onChange={e => setWeeklyStart(e.target.value)} />
-                  </div>
+                    <div className="btn-container mb-05">
+                      <label >Start date</label>
+                      <input
+                        type="date"
+                        className="input mb-1"
+                        min={minDate}
+                        value={weeklyStart}
+                        onChange={e => setWeeklyStart(e.target.value)}
+                      />
+
+                    </div>
                     <div className="flex space-btw wrap gap-05 mb-1">
                       <label >Deliver on: </label>
                       <div className="flex wrap gap-05">

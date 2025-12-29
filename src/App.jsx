@@ -9,20 +9,18 @@ import Contact from './Pages/Contact/Contact'
 import Faq from './Pages/Faq/Faq'
 import Login from './Pages/Login/Login'
 import Profile from './Pages/Profile/Profile'
-import { supabase } from './utils/supabaseClient'
 import PrivateRoute from './Components/PrivateRoute'
 import AdminDashboardPage from './Pages/AdminDashboard/AdminDashboard'
 import WhatsAppFab from './Components/WhatsAppFab/WhatsAppFab'
 
 
 function App() {
-  // supabase.auth.getSession().then(console.log);
-  // console.count('rendered')
   const location = useLocation();
   const hideFooter = location.pathname === "/login";
+  const hideHeader = location.pathname === "/login";
   return (
     <>
-      <Header />
+      {!hideHeader && <Header />}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />

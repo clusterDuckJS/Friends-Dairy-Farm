@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useCart } from "../../Context/CartContext";
-import { LuTrash2 } from "react-icons/lu";
+import { LuCircle, LuCircleCheck, LuTrash2 } from "react-icons/lu";
 
 
 /*
@@ -48,7 +48,10 @@ export default function ProductCard({ product }) {
         <ul className="mb-1">
           {product.features?.map((f, i) => (
             <li key={i} className="mb-1">
-              <span className="color-success">•</span> {f}
+              <span className="color-success flex align-center ">
+                <LuCircleCheck />
+              </span> 
+              {f}
             </li>
           ))}
         </ul>
