@@ -76,6 +76,7 @@ section {
   color: #fff;
   border-color: gainsboro;
 }
+
 /* =========================== */
 
 .badge {
@@ -178,6 +179,22 @@ li {
   font-style: italic;
 }
 
+.text-primary {
+  color: var(--color-primary);
+}
+
+.text-light {
+  color: grey;
+}
+
+.text-error {
+  color: var(--color-error);
+}
+
+.text-success {
+  color: var(--color-success);
+}
+
 /* ===================================================================================== */
 
 /* =============================INPUTS============================= */
@@ -222,6 +239,38 @@ button.primary {
   }
 }
 
+/* ===================cart */
+.qty-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid #ddd;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.qty-btn:hover {
+  background: #f5f5f5;
+}
+
+.qty-value {
+  min-width: 20px;
+  text-align: center;
+}
+
+.cart-remove {
+  color: #999;
+  transition: color 0.15s ease;
+}
+
+.cart-remove:hover {
+  color: #e63946;
+}
+/* ====================cart end */
+
 button.secondary {
   padding: 0.4rem 2rem;
   background-color: transparent;
@@ -234,6 +283,10 @@ button.secondary {
   gap: 0.5rem;
   font-weight: 500;
   border-radius: 0.3rem;
+  &:disabled{
+    /* opacity: 0.6; */
+    cursor: not-allowed;
+  }
 
   &.cancel {
     border-color: var(--color-error);
@@ -269,6 +322,18 @@ button.secondary {
   font-size: 2rem;
   color: var(--color-primary);
   border-radius: 50%;
+
+  &.square {
+    border-radius: 0.5rem;
+  }
+
+  &.bg-success {
+    background-color: rgb(23 163 74 / 10%);
+  }
+
+  &.bg-error {
+    background-color: rgb(255 65 65 / 10%);
+  }
 }
 
 /* ========================================FLEX======================================== */
@@ -276,7 +341,7 @@ button.secondary {
   display: flex;
 }
 
-.flex-column { 
+.flex-column {
   display: flex;
   flex-direction: column;
 }
@@ -301,9 +366,10 @@ button.secondary {
   align-items: flex-start;
 }
 
-.wrap{
+.wrap {
   flex-wrap: wrap;
 }
+
 .gap-05 {
   gap: 0.5rem;
 }

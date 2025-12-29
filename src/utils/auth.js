@@ -1,73 +1,35 @@
 // /src/utils/auth.js
 import { supabase } from "./supabaseClient";
 
-async function _ensureProfileRow(
-  userId,
-  { full_name = "", phone_number = "", email = "" } = {}
-) {
-  if (!userId) return null;
-
-  const { data, error } = await supabase
-    .from("profiles")
-    .upsert(
-      {
-        id: userId,
-        full_name,
-        phone: phone_number,
-        email,                     // ⭐ added here
-        delivery_address: null,
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: "id" }
-    )
-    .select()
-    .maybeSingle();
-
-  if (error) {
-    console.error("ensureProfileRow error:", error);
-    return null;
-  }
-
-  return data;
-}
-
-
+/**
+ * SIGN UP USER
+ * - Creates auth user (email + password)
+ * - Passes metadata for DB trigger
+ * - Profiles row is created by DB trigger (NOT frontend)
+ */
 export async function signUpUser({ email, password, fullName, phone }) {
   const { data, error } = await supabase.auth.signUp({
-    email,
+    email: email.trim(),
     password,
     options: {
       data: {
-        full_name: fullName,
-        phone_number: phone,
+        full_name: fullName?.trim() || null,
+        phone: phone?.trim() || null,
       },
     },
   });
 
   if (error) throw error;
 
-  // ---- IMPORTANT ----
-  // Immediately create the profile row after sign up
-  const userId = data?.user?.id;
-  if (userId) {
-    try {
-      await _ensureProfileRow(userId, {
-        full_name: fullName,
-        phone_number: phone,
-      });
-    } catch (err) {
-      console.error("Failed to auto-create profile:", err);
-    }
-  } else {
-    console.warn("signUpUser: No user.id returned from signUp");
-  }
-
   return data;
 }
 
+/**
+ * LOGIN USER
+ */
 export async function loginUser({ email, password }) {
   const { data, error } = await supabase.auth.signInWithPassword({
-    email,
+    email: email.trim(),
     password,
   });
 
@@ -75,6 +37,9 @@ export async function loginUser({ email, password }) {
   return data;
 }
 
+/**
+ * LOGOUT USER
+ */
 export async function logoutUser() {
   const { error } = await supabase.auth.signOut();
   if (error) throw error;

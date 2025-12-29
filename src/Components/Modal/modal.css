@@ -38,34 +38,6 @@
   border-bottom: 1px solid #eee;
 }
 
-.qty-btn {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  border: 1px solid #ddd;
-  background: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-}
 
-.qty-btn:hover {
-  background: #f5f5f5;
-}
-
-.qty-value {
-  min-width: 20px;
-  text-align: center;
-}
-
-.cart-remove {
-  color: #999;
-  transition: color 0.15s ease;
-}
-
-.cart-remove:hover {
-  color: #e63946;
-}
 
 }

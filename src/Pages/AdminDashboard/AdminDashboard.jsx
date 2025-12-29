@@ -16,6 +16,7 @@ import {
 } from "../../utils/admin";
 import { formatDateOnly, formatDateTime } from "../../utils/date.js";
 import { formatScheduleReadable } from "../../utils/scheduleUtils.js";
+import { LuAArrowDown, LuArrowDown, LuChartColumnBig, LuCheck, LuCircleAlert, LuCircleCheckBig, LuSquareCheckBig, LuTrendingUp } from "react-icons/lu";
 
 export default function AdminDashboardPage() {
   return (
@@ -77,7 +78,9 @@ function OrdersPanel() {
     }
   }
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+  }, []);
 
   async function changeStatus(id, status) {
     setUpdatingId(id);
@@ -94,9 +97,77 @@ function OrdersPanel() {
   }
 
   return (
-    <div>
+    <div className="dashboard orders">
       <h2 className="panel-title">Orders</h2>
-      {loading ? <div className="empty">Loading orders…</div> : (
+
+      <div className="cards-container">
+        <div className="card flex space-btw align-center gap-1">
+          <div className="text-wrapper">
+            <p className="text-light mb-1">Total</p>
+            <h3 className="bold text-primary">{orders.length}</h3>
+          </div>
+          <div className="svg-wrapper square">
+            <LuTrendingUp size={24} className="icon-primary" />
+          </div>
+        </div>
+
+        <div className="card flex space-btw align-center gap-1">
+          <div className="text-wrapper">
+            <p className="text-light mb-1">Pending</p>
+            <h3 className="bold text-success">
+              {orders.filter(o => o.status === "pending").length}
+            </h3>
+          </div>
+          <div className="svg-wrapper square bg-success">
+            <LuCircleCheckBig size={24} className="text-success" />
+          </div>
+        </div>
+
+        <div className="card flex space-btw align-center gap-1">
+          <div className="text-wrapper">
+            <p className="text-light mb-1">Confirmed</p>
+            <h3 className="bold text-success">
+              {orders.filter(o => o.status === "confirmed").length}
+            </h3>
+          </div>
+          <div className="svg-wrapper square bg-success">
+            <LuCircleCheckBig size={24} className="text-success" />
+          </div>
+        </div>
+
+        <div className="card flex space-btw align-center gap-1">
+          <div className="text-wrapper">
+            <p className="text-light mb-1">Delivered</p>
+            <h3 className="bold text-error">
+              {orders.filter(o => o.status === "delivered").length}
+            </h3>
+          </div>
+          <div className="svg-wrapper square bg-error">
+            <LuCircleAlert size={24} className="text-error" />
+          </div>
+        </div>
+
+        <div className="card flex space-btw align-center gap-1">
+          <div className="text-wrapper">
+            <p className="text-light mb-1">Cancelled</p>
+            <h3 className="bold text-error">
+              {orders.filter(o => o.status === "cancelled").length}
+            </h3>
+          </div>
+          <div className="svg-wrapper square bg-error">
+            <LuCircleAlert size={24} className="text-error" />
+          </div>
+        </div>
+      </div>
+
+      {loading ? (
+        <div className="empty">Loading orders…</div>
+      ) : orders.length === 0 ? (
+        <div className="empty flex-column">
+          <h3 className="bold">No orders yet</h3>
+          <p className="text-light">Orders will appear here once customers place them.</p>
+        </div>
+      ) : (
         <table className="admin-table">
           <thead>
             <tr>
@@ -110,6 +181,7 @@ function OrdersPanel() {
               <th>Actions</th>
             </tr>
           </thead>
+
           <tbody>
             {orders.map(o => (
               <tr key={o.id}>
@@ -118,16 +190,31 @@ function OrdersPanel() {
                 <td>
                   {Array.isArray(o.items)
                     ? o.items.map((it, i) => (
-                      <div key={i}>{it.name} ×{it.qty}</div>
+                      <div key={i}>
+                        {it.name} ×{it.qty}
+                      </div>
                     ))
-                    : <pre style={{ margin: 0 }}>{JSON.stringify(o.items)}</pre>}
+                    : (
+                      <pre style={{ margin: 0 }}>
+                        {JSON.stringify(o.items)}
+                      </pre>
+                    )}
                 </td>
 
                 <td>₹{Number(o.total_amount || 0).toFixed(2)}</td>
 
-                <td className="mono">{o.user_id?.slice(0, 8) || "—"}</td>
+                {/* ✅ FIXED USER COLUMN */}
+                <td>
+                  {o.user ? (
+                    <div>
+                      <div className="bold">{o.user.full_name || "—"}</div>
+                      <div className="text-light">{o.user.phone || "—"}</div>
+                    </div>
+                  ) : (
+                    <span className="text-light">—</span>
+                  )}
+                </td>
 
-                {/* <-- CLEAN SCHEDULE DISPLAY --> */}
                 <td style={{ maxWidth: 240 }}>
                   {formatScheduleReadable(o)}
                 </td>
@@ -136,7 +223,9 @@ function OrdersPanel() {
                   <StatusBadge status={o.status} />
                 </td>
 
-                <td className="mono">{formatDateTime(o.created_at)}</td>
+                <td className="mono">
+                  {formatDateTime(o.created_at)}
+                </td>
 
                 <td>
                   <div style={{ display: "flex", gap: 8 }}>
@@ -147,7 +236,7 @@ function OrdersPanel() {
                           open: true,
                           id: o.id,
                           status: "confirmed",
-                          cb: () => changeStatus(o.id, "confirmed")
+                          cb: () => changeStatus(o.id, "confirmed"),
                         })
                       }
                       className="primary sm"
@@ -162,7 +251,7 @@ function OrdersPanel() {
                           open: true,
                           id: o.id,
                           status: "delivered",
-                          cb: () => changeStatus(o.id, "delivered")
+                          cb: () => changeStatus(o.id, "delivered"),
                         })
                       }
                       className="primary sm"
@@ -177,7 +266,7 @@ function OrdersPanel() {
                           open: true,
                           id: o.id,
                           status: "cancelled",
-                          cb: () => changeStatus(o.id, "cancelled")
+                          cb: () => changeStatus(o.id, "cancelled"),
                         })
                       }
                       className="secondary cancel sm"
@@ -189,7 +278,6 @@ function OrdersPanel() {
               </tr>
             ))}
           </tbody>
-
         </table>
       )}
 
@@ -197,12 +285,16 @@ function OrdersPanel() {
         open={confirm.open}
         title="Confirm status change"
         message={`Change order ${confirm.id?.slice(0, 8)} to "${confirm.status}"?`}
-        onConfirm={() => { setConfirm({ open: false }); confirm.cb && confirm.cb(); }}
+        onConfirm={() => {
+          setConfirm({ open: false });
+          confirm.cb && confirm.cb();
+        }}
         onCancel={() => setConfirm({ open: false })}
       />
     </div>
   );
 }
+
 
 
 
@@ -241,8 +333,37 @@ function SubscriptionsPanel() {
   }
 
   return (
-    <div>
+    <div className="dashboard subscription">
       <h2 className="panel-title">Subscriptions</h2>
+      <div className="cards-container">
+        <div className="card flex space-btw align-center gap-1">
+          <div className="text-wrapper">
+            <p className="text-light mb-1">Total</p>
+            <h3 className="bold text-primary">{subs.length}</h3>
+          </div>
+          <div className="svg-wrapper square">
+            <LuTrendingUp size={24} className="icon-primary" />
+          </div>
+        </div>
+        <div className="card flex space-btw align-center gap-1">
+          <div className="text-wrapper">
+            <p className="text-light mb-1">Active</p>
+            <h3 className="bold text-success">{subs.filter(s => s.is_active).length}</h3>
+          </div>
+          <div className="svg-wrapper square bg-success">
+            <LuCircleCheckBig size={24} className="text-success" />
+          </div>
+        </div>
+        <div className="card flex space-btw align-center gap-1">
+          <div className="text-wrapper">
+            <p className="text-light mb-1">Inactive</p>
+            <h3 className="bold text-error">{subs.filter(s => !s.is_active).length}</h3>
+          </div>
+          <div className="svg-wrapper square bg-error">
+            <LuCircleAlert size={24} className="text-error" />
+          </div>
+        </div>
+      </div>
 
       {loading ? (
         <div className="empty">Loading…</div>
@@ -357,40 +478,72 @@ function UsersPanel() {
   }
 
   return (
-    <div>
+    <div className="dashboard users">
       <h2 className="panel-title">Users</h2>
       {loading ? <div className="empty">Loading users…</div> : (
-        <table className="admin-table">
-          <thead>
-            <tr>
-              <th>User</th>
-              <th>Phone</th>
-              <th>Address</th>
-              <th>Admin</th>
-              <th>Joined</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map(u => (
-              <tr key={u.id}>
-                <td>
-                  <div style={{ fontWeight: 700 }}>{u.full_name || <span className="mono">{u.id.slice(0, 8)}</span>}</div>
-                  <div className="muted mono">{u.user_email || u.email || "—"}</div>
-                </td>
-                <td>{u.phone || "—"}</td>
-                <td style={{ maxWidth: 280 }}>{u.delivery_address || "—"}</td>
-                <td>{u.is_admin ? "Yes" : "No"}</td>
-                <td className="mono">{u.created_at ? new Date(u.created_at).toLocaleString() : "—"}</td>
-                <td>
-                  <button className="primary sm" disabled={toggling === u.id} onClick={() => toggleAdmin(u)}>
-                    {toggling === u.id ? "Working…" : (u.is_admin ? "Revoke" : "Make admin")}
-                  </button>
-                </td>
+        <>
+          <div className="cards-container">
+            <div className="card flex space-btw align-center gap-1">
+              <div className="text-wrapper">
+                <p className="text-light mb-1">Total</p>
+                <h3 className="bold text-primary">{users.length}</h3>
+              </div>
+              <div className="svg-wrapper square">
+                <LuTrendingUp size={24} className="icon-primary" />
+              </div>
+            </div>
+
+            <div className="card flex space-btw align-center gap-1">
+              <div className="text-wrapper">
+                <p className="text-light mb-1">Active</p>
+                <h3 className="bold text-primary">{users.length}</h3>
+              </div>
+              <div className="svg-wrapper square bg-error">
+                <LuCircleAlert size={24} className="text-error" />
+              </div>
+            </div>
+            <div className="card flex space-btw align-center gap-1">
+              <div className="text-wrapper">
+                <p className="text-light mb-1">Weekly Change</p>
+                <h3 className="bold text-primary">+{users.length}</h3>
+              </div>
+              <div className="svg-wrapper square bg-error">
+                <LuCircleAlert size={24} className="text-error" />
+              </div>
+            </div>
+          </div>
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Phone</th>
+                <th>Address</th>
+                <th>Admin</th>
+                <th>Joined</th>
+                <th>Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {users.map(u => (
+                <tr key={u.id}>
+                  <td>
+                    <div style={{ fontWeight: 700 }}>{u.full_name || <span className="mono">{u.id.slice(0, 8)}</span>}</div>
+                    <div className="muted mono">{u.user_email || u.email || "—"}</div>
+                  </td>
+                  <td>{u.phone || "—"}</td>
+                  <td style={{ maxWidth: 280 }}>{u.delivery_address || "—"}</td>
+                  <td>{u.is_admin ? "Yes" : "No"}</td>
+                  <td className="mono">{u.created_at ? new Date(u.created_at).toLocaleString() : "—"}</td>
+                  <td>
+                    <button className="primary sm" disabled={toggling === u.id} onClick={() => toggleAdmin(u)}>
+                      {toggling === u.id ? "Working…" : (u.is_admin ? "Revoke" : "Make admin")}
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </>
       )}
     </div>
   );
