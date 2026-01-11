@@ -1,15 +1,45 @@
 
 import HERO from '../../assets/hero.webp'
+import HERO1 from '../../assets/gallery/WA00018.jpeg'
+import HERO2 from '../../assets/gallery/WA00019.jpeg'
+import HERO3 from '../../assets/gallery/WA00017.jpeg'
+import HERO4 from '../../assets/gallery/WA00016.jpg'
+import HERO5 from '../../assets/gallery/WA00015.jpg'
+import HERO6 from '../../assets/gallery/WA00014.jpg'
+import HERO7 from '../../assets/gallery/WA00013.jpg'
+import HERO8 from '../../assets/gallery/WA00012.jpg'
 import './home.css'
 import MILK from '../../assets/milk.webp'
 import GHEE from '../../assets/ghee.webp'
 import { LuArrowRight, LuHeart, LuLeaf, LuMilk, LuTruck } from 'react-icons/lu'
 import { GoStarFill } from 'react-icons/go'
 import { useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
 
 function Home() {
 
     const navigate = useNavigate();
+    const heroImages = [
+        HERO1,
+        HERO3,
+        HERO2,
+        HERO4,
+        HERO5,
+        HERO6,
+        HERO7,
+        HERO8,
+    ];
+
+    const [activeIdx, setActiveIdx] = useState(0);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setActiveIdx(i => (i + 1) % heroImages.length);
+        }, 3000); // 3 second
+
+        return () => clearInterval(interval);
+    }, []);
+
 
     return (
         <div className='main-container home'>
@@ -25,7 +55,17 @@ function Home() {
                         <button className='secondary' onClick={() => navigate('/profile')}>Schedule Delivery</button>
                     </div>
                 </div>
-                <img src={HERO} alt="cow" />
+                {/* <img src={HERO} alt="cow" /> */}
+                <div className="hero-image-wrapper">
+                    {heroImages.map((img, idx) => (
+                        <img
+                            key={idx}
+                            src={img}
+                            alt="farm"
+                            className={`hero-image ${idx === activeIdx ? "active" : ""}`}
+                        />
+                    ))}
+                </div>
             </section>
 
             {/* why us */}
@@ -93,7 +133,7 @@ function Home() {
                         </div>
                     </div>
                 </div>
-                <button className='primary' onClick={() => navigate('/products')}>View All Products <LuArrowRight/></button>
+                <button className='primary' onClick={() => navigate('/products')}>View All Products <LuArrowRight /></button>
             </section>
 
             {/* Review */}

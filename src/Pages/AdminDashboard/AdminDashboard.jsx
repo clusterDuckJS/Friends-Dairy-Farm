@@ -16,7 +16,7 @@ import {
 } from "../../utils/admin";
 import { formatDateOnly, formatDateTime } from "../../utils/date.js";
 import { formatScheduleReadable } from "../../utils/scheduleUtils.js";
-import { LuAArrowDown, LuArrowDown, LuChartColumnBig, LuCheck, LuCircleAlert, LuCircleCheckBig, LuSquareCheckBig, LuTrendingUp } from "react-icons/lu";
+import { LuCircleAlert, LuCircleCheckBig, LuSquareCheckBig, LuTrendingUp, LuTriangleAlert, LuTruck } from "react-icons/lu";
 
 export default function AdminDashboardPage() {
   return (
@@ -60,15 +60,21 @@ function AdminTabs() {
 
 function OrdersPanel() {
   const toast = useToast();
-  const [orders, setOrders] = useState([]);
+  const [orders, setOrders] = useState([]); // filtered
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState(null);
   const [confirm, setConfirm] = useState({ open: false });
+  const [allOrders, setAllOrders] = useState([]);
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [dateFilter, setDateFilter] = useState("");
+
+
 
   async function load() {
     setLoading(true);
     try {
       const data = await adminGetAllOrders();
+      setAllOrders(data || []);
       setOrders(data || []);
     } catch (e) {
       console.error(e);
@@ -78,9 +84,37 @@ function OrdersPanel() {
     }
   }
 
+  const stats = {
+    total: allOrders.length,
+    pending: allOrders.filter(o => o.status === "pending").length,
+    confirmed: allOrders.filter(o => o.status === "confirmed").length,
+    delivered: allOrders.filter(o => o.status === "delivered").length,
+    cancelled: allOrders.filter(o => o.status === "cancelled").length,
+  };
+
+
+
   useEffect(() => {
     load();
   }, []);
+
+  useEffect(() => {
+    let filtered = [...allOrders];
+
+    if (statusFilter !== "all") {
+      filtered = filtered.filter(o => o.status === statusFilter);
+    }
+
+    if (dateFilter) {
+      filtered = filtered.filter(o => {
+        const orderDate = new Date(o.created_at).toISOString().split("T")[0];
+        return orderDate === dateFilter;
+      });
+    }
+
+    setOrders(filtered);
+  }, [statusFilter, dateFilter, allOrders]);
+
 
   async function changeStatus(id, status) {
     setUpdatingId(id);
@@ -104,7 +138,7 @@ function OrdersPanel() {
         <div className="card flex space-btw align-center gap-1">
           <div className="text-wrapper">
             <p className="text-light mb-1">Total</p>
-            <h3 className="bold text-primary">{orders.length}</h3>
+            <h3 className="bold text-primary">{stats.total}</h3>
           </div>
           <div className="svg-wrapper square">
             <LuTrendingUp size={24} className="icon-primary" />
@@ -114,21 +148,17 @@ function OrdersPanel() {
         <div className="card flex space-btw align-center gap-1">
           <div className="text-wrapper">
             <p className="text-light mb-1">Pending</p>
-            <h3 className="bold text-success">
-              {orders.filter(o => o.status === "pending").length}
-            </h3>
+            <h3 className="bold text-success">{stats.pending}</h3>
           </div>
           <div className="svg-wrapper square bg-success">
-            <LuCircleCheckBig size={24} className="text-success" />
+            <LuTriangleAlert color="orange" size={24} className="text-success" />
           </div>
         </div>
 
         <div className="card flex space-btw align-center gap-1">
           <div className="text-wrapper">
             <p className="text-light mb-1">Confirmed</p>
-            <h3 className="bold text-success">
-              {orders.filter(o => o.status === "confirmed").length}
-            </h3>
+            <h3 className="bold text-success">{stats.confirmed}</h3>
           </div>
           <div className="svg-wrapper square bg-success">
             <LuCircleCheckBig size={24} className="text-success" />
@@ -138,28 +168,53 @@ function OrdersPanel() {
         <div className="card flex space-btw align-center gap-1">
           <div className="text-wrapper">
             <p className="text-light mb-1">Delivered</p>
-            <h3 className="bold text-error">
-              {orders.filter(o => o.status === "delivered").length}
-            </h3>
+            <h3 className="bold text-success">{stats.delivered}</h3>
           </div>
-          <div className="svg-wrapper square bg-error">
-            <LuCircleAlert size={24} className="text-error" />
+          <div className="svg-wrapper square bg-success">
+            <LuTruck size={24} className="text-success" />
           </div>
         </div>
 
         <div className="card flex space-btw align-center gap-1">
           <div className="text-wrapper">
             <p className="text-light mb-1">Cancelled</p>
-            <h3 className="bold text-error">
-              {orders.filter(o => o.status === "cancelled").length}
-            </h3>
+            <h3 className="bold text-error">{stats.cancelled}</h3>
           </div>
           <div className="svg-wrapper square bg-error">
             <LuCircleAlert size={24} className="text-error" />
           </div>
         </div>
       </div>
+      <div className="filter-bar flex gap-1 mb-1">
+        <select
+          value={statusFilter}
+          onChange={e => setStatusFilter(e.target.value)}
+        >
+          <option value="all">All statuses</option>
+          <option value="pending">Pending</option>
+          <option value="confirmed">Confirmed</option>
+          <option value="delivered">Delivered</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
 
+        <input
+          type="date"
+          value={dateFilter}
+          onChange={e => setDateFilter(e.target.value)}
+        />
+
+        {(statusFilter !== "all" || dateFilter) && (
+          <button
+            className="secondary sm"
+            onClick={() => {
+              setStatusFilter("all");
+              setDateFilter("");
+            }}
+          >
+            Clear
+          </button>
+        )}
+      </div>
       {loading ? (
         <div className="empty">Loading orders…</div>
       ) : orders.length === 0 ? (
@@ -167,7 +222,9 @@ function OrdersPanel() {
           <h3 className="bold">No orders yet</h3>
           <p className="text-light">Orders will appear here once customers place them.</p>
         </div>
-      ) : (
+      ) : (<>
+
+
         <table className="admin-table">
           <thead>
             <tr>
@@ -187,7 +244,7 @@ function OrdersPanel() {
               <tr key={o.id}>
                 <td className="mono">#{o.id.slice(0, 8)}</td>
 
-                <td>
+                <td className="no-wrap">
                   {Array.isArray(o.items)
                     ? o.items.map((it, i) => (
                       <div key={i}>
@@ -211,7 +268,7 @@ function OrdersPanel() {
                       <div className="text-light">{o.user.phone || "—"}</div>
                     </div>
                   ) : (
-                    <span className="text-light">—</span>
+                    <span className="text-light">No data</span>
                   )}
                 </td>
 
@@ -279,6 +336,7 @@ function OrdersPanel() {
             ))}
           </tbody>
         </table>
+      </>
       )}
 
       <ConfirmModal

@@ -1,6 +1,7 @@
 import React from 'react'
 import './about.css'
 import Logo from '../../assets/logo.webp'
+import ABOUT from "../../assets/gallery/WA00020.jpeg";
 import { LuAward, LuHeart, LuTruck, LuUsers } from 'react-icons/lu'
 
 function About() {
@@ -18,7 +19,7 @@ function About() {
           <p className="mb-2">We believe in traditional farming methods combined with modern hygiene standards. Our cows graze freely on natural grass, breathe fresh air, and are treated with love and respect. This translates directly into the quality and taste of our products.</p>
           <p className="mb-2">Every morning, we deliver freshness to your doorstep - not just milk, but a commitment to your family's health and well-being.</p>
         </div>
-        <img src="https://images.unsplash.com/photo-1500595046743-cd271d694d30?w=800&q=80" alt="cow" />
+        <img src={ABOUT} alt="cow" />
       </section>
 
       <section className="values flex-column align-center">

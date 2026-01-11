@@ -12,7 +12,7 @@ export function formatScheduleReadable(item) {
   const meta = safeParseMeta(item?.schedule_meta);
   if (type === "one-time" || type === "one_time" || type === "onetime") {
     const date = meta?.date || meta?.start_date || item?.next_delivery_date;
-    return `One-time — ${formatDateOnly(date)}`;
+    return `(One-time) ${formatDateOnly(date)}`;
   }
   if (type === "daily") {
     const start = meta?.start_date || item?.next_delivery_date;
