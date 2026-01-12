@@ -16,7 +16,7 @@ import {
 } from "../../utils/admin";
 import { formatDateOnly, formatDateTime } from "../../utils/date.js";
 import { formatScheduleReadable } from "../../utils/scheduleUtils.js";
-import { LuCircleAlert, LuCircleCheckBig, LuSquareCheckBig, LuTrendingUp, LuTriangleAlert, LuTruck } from "react-icons/lu";
+import { LuCircleAlert, LuCircleCheckBig, LuTrendingUp, LuTriangleAlert, LuTruck } from "react-icons/lu";
 
 export default function AdminDashboardPage() {
   return (
@@ -286,50 +286,54 @@ function OrdersPanel() {
 
                 <td>
                   <div style={{ display: "flex", gap: 8 }}>
-                    <button
-                      disabled={updatingId === o.id}
-                      onClick={() =>
-                        setConfirm({
-                          open: true,
-                          id: o.id,
-                          status: "confirmed",
-                          cb: () => changeStatus(o.id, "confirmed"),
-                        })
-                      }
-                      className="primary sm"
-                    >
-                      Confirm
-                    </button>
+                    {o.status === "pending" && (
+                      <button
+                        disabled={updatingId === o.id}
+                        onClick={() =>
+                          setConfirm({
+                            open: true,
+                            id: o.id,
+                            status: "confirmed",
+                            cb: () => changeStatus(o.id, "confirmed"),
+                          })
+                        }
+                        className="primary sm"
+                      >
+                        Confirm
+                      </button>)}
 
-                    <button
-                      disabled={updatingId === o.id}
-                      onClick={() =>
-                        setConfirm({
-                          open: true,
-                          id: o.id,
-                          status: "delivered",
-                          cb: () => changeStatus(o.id, "delivered"),
-                        })
-                      }
-                      className="primary sm"
-                    >
-                      Delivered
-                    </button>
+                    {o.status === "confirmed" && (
 
-                    <button
-                      disabled={updatingId === o.id}
-                      onClick={() =>
-                        setConfirm({
-                          open: true,
-                          id: o.id,
-                          status: "cancelled",
-                          cb: () => changeStatus(o.id, "cancelled"),
-                        })
-                      }
-                      className="secondary cancel sm"
-                    >
-                      Cancel
-                    </button>
+                      <button
+                        disabled={updatingId === o.id}
+                        onClick={() =>
+                          setConfirm({
+                            open: true,
+                            id: o.id,
+                            status: "delivered",
+                            cb: () => changeStatus(o.id, "delivered"),
+                          })
+                        }
+                        className="primary sm"
+                      >
+                        Delivered
+                      </button>)}
+
+                    {o.status !== "cancelled" && o.status !== "delivered" && (
+                      <button
+                        disabled={updatingId === o.id}
+                        onClick={() =>
+                          setConfirm({
+                            open: true,
+                            id: o.id,
+                            status: "cancelled",
+                            cb: () => changeStatus(o.id, "cancelled"),
+                          })
+                        }
+                        className="secondary cancel sm"
+                      >
+                        Cancel
+                      </button>)}
                   </div>
                 </td>
               </tr>
@@ -360,14 +364,20 @@ function OrdersPanel() {
 
 function SubscriptionsPanel() {
   const toast = useToast();
+
   const [subs, setSubs] = useState([]);
+  const [allSubs, setAllSubs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [confirm, setConfirm] = useState({ open: false });
+
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [dateFilter, setDateFilter] = useState("");
 
   async function load() {
     setLoading(true);
     try {
       const data = await adminGetAllSubscriptions();
+      setAllSubs(data || []);
       setSubs(data || []);
     } catch (e) {
       console.error("subscriptions load:", e);
@@ -377,7 +387,29 @@ function SubscriptionsPanel() {
     }
   }
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+  }, []);
+
+  useEffect(() => {
+    let filtered = [...allSubs];
+
+    // Status filter
+    if (statusFilter !== "all") {
+      filtered = filtered.filter(s =>
+        statusFilter === "active" ? s.is_active : !s.is_active
+      );
+    }
+
+    // Next delivery date filter
+    if (dateFilter) {
+      filtered = filtered.filter(
+        s => s.next_delivery_date === dateFilter
+      );
+    }
+
+    setSubs(filtered);
+  }, [statusFilter, dateFilter, allSubs]);
 
   async function cancelSub(id) {
     try {
@@ -390,32 +422,42 @@ function SubscriptionsPanel() {
     }
   }
 
+  const stats = {
+    total: allSubs.length,
+    active: allSubs.filter(s => s.is_active).length,
+    inactive: allSubs.filter(s => !s.is_active).length,
+  };
+
   return (
     <div className="dashboard subscription">
       <h2 className="panel-title">Subscriptions</h2>
+
+      {/* Stats */}
       <div className="cards-container">
         <div className="card flex space-btw align-center gap-1">
           <div className="text-wrapper">
             <p className="text-light mb-1">Total</p>
-            <h3 className="bold text-primary">{subs.length}</h3>
+            <h3 className="bold text-primary">{stats.total}</h3>
           </div>
           <div className="svg-wrapper square">
             <LuTrendingUp size={24} className="icon-primary" />
           </div>
         </div>
+
         <div className="card flex space-btw align-center gap-1">
           <div className="text-wrapper">
             <p className="text-light mb-1">Active</p>
-            <h3 className="bold text-success">{subs.filter(s => s.is_active).length}</h3>
+            <h3 className="bold text-success">{stats.active}</h3>
           </div>
           <div className="svg-wrapper square bg-success">
             <LuCircleCheckBig size={24} className="text-success" />
           </div>
         </div>
+
         <div className="card flex space-btw align-center gap-1">
           <div className="text-wrapper">
             <p className="text-light mb-1">Inactive</p>
-            <h3 className="bold text-error">{subs.filter(s => !s.is_active).length}</h3>
+            <h3 className="bold text-error">{stats.inactive}</h3>
           </div>
           <div className="svg-wrapper square bg-error">
             <LuCircleAlert size={24} className="text-error" />
@@ -423,17 +465,52 @@ function SubscriptionsPanel() {
         </div>
       </div>
 
+      {/* Filters */}
+      <div className="filter-bar flex gap-1 mb-1">
+        <select
+          value={statusFilter}
+          onChange={e => setStatusFilter(e.target.value)}
+        >
+          <option value="all">All</option>
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </select>
+
+        <input
+          type="date"
+          value={dateFilter}
+          onChange={e => setDateFilter(e.target.value)}
+        />
+
+        {(statusFilter !== "all" || dateFilter) && (
+          <button
+            className="secondary sm"
+            onClick={() => {
+              setStatusFilter("all");
+              setDateFilter("");
+            }}
+          >
+            Clear
+          </button>
+        )}
+      </div>
+
+      {/* Table */}
       {loading ? (
         <div className="empty">Loading…</div>
+      ) : subs.length === 0 ? (
+        <div className="empty flex-column">
+          <h3 className="bold">No subscriptions found</h3>
+          <p className="text-light">Try changing the filters.</p>
+        </div>
       ) : (
         <table className="admin-table">
           <thead>
             <tr>
-              <th>ID</th>
+              <th>User</th>
               <th>Product</th>
               <th>Schedule</th>
               <th>Next</th>
-              <th>User</th>
               <th>Active</th>
               <th>Actions</th>
             </tr>
@@ -442,7 +519,10 @@ function SubscriptionsPanel() {
           <tbody>
             {subs.map(s => {
               const scheduleText = formatScheduleReadable(s);
-              const nextDate = s.next_delivery_date ? formatDateOnly(s.next_delivery_date) : "—";
+              const nextDate = s.next_delivery_date
+                ? formatDateOnly(s.next_delivery_date)
+                : "—";
+
               return (
                 <tr key={s.id}>
                   <td>
@@ -454,19 +534,25 @@ function SubscriptionsPanel() {
                     </div>
                   </td>
 
-
-                  <td style={{ maxWidth: 320 }}>{s.product_name}</td>
-                  <td style={{ maxWidth: 280 }}>{scheduleText}</td>
+                  <td>{s.product_name}</td>
+                  <td style={{ maxWidth: 260 }}>{scheduleText}</td>
                   <td className="mono">{nextDate}</td>
-                  <td className="mono">{s.user_id?.slice(0, 8) || "—"}</td>
                   <td>{s.is_active ? "Yes" : "No"}</td>
                   <td>
-                    <button
-                      className="secondary sm cancel"
-                      onClick={() => setConfirm({ open: true, id: s.id, cb: () => cancelSub(s.id) })}
-                    >
-                      Cancel
-                    </button>
+                    {s.is_active && (
+                      <button
+                        className="secondary sm cancel"
+                        onClick={() =>
+                          setConfirm({
+                            open: true,
+                            id: s.id,
+                            cb: () => cancelSub(s.id),
+                          })
+                        }
+                      >
+                        Cancel
+                      </button>
+                    )}
                   </td>
                 </tr>
               );
@@ -479,12 +565,16 @@ function SubscriptionsPanel() {
         open={confirm.open}
         title="Confirm cancel"
         message={`Cancel subscription ${confirm.id?.slice(0, 8)}?`}
-        onConfirm={() => { setConfirm({ open: false }); confirm.cb && confirm.cb(); }}
+        onConfirm={() => {
+          setConfirm({ open: false });
+          confirm.cb && confirm.cb();
+        }}
         onCancel={() => setConfirm({ open: false })}
       />
     </div>
   );
 }
+
 
 
 /* ---------- Users ---------- */

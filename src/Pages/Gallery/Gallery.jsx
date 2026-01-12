@@ -2,10 +2,6 @@ import React from 'react'
 import './gallery.css'
 import Logo from '../../assets/logo.webp'
 
-
-
-
-
 function Gallery() {
     const GALLERY_IMAGES = [
         "https://vrygzawhgoqnaabqsoll.supabase.co/storage/v1/object/public/Gallery/WA0001.webp",
