@@ -346,6 +346,10 @@ button.secondary {
   display: flex;
 }
 
+.flex-1 {
+  flex: 1;
+}
+
 .flex-column {
   display: flex;
   flex-direction: column;
@@ -371,6 +375,9 @@ button.secondary {
   align-items: flex-start;
 }
 
+.align-end{
+  align-items: flex-end;
+}
 .wrap {
   flex-wrap: wrap;
 }

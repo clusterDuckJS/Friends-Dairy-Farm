@@ -4,13 +4,28 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { getProfile, getSubscriptionsForUser, upsertProfile } from '../../utils/profile';
 import Modal from '../../Components/Modal/Modal';
-import ScheduleModal from '../../Components/ScheduleModal/ScheduleModal';
-import { cancelSubscription } from '../../utils/subscription';
 import { getOrdersForUser } from '../../utils/orders';
 import { useToast } from '../../Context/ToastContext';
 import { supabase } from '../../utils/supabaseClient';
 
 function Profile() {
+
+    const EMPTY_CANCEL_MODAL = {
+        open: false,
+        sub: null,
+        reasons: [],
+        other: "",
+    };
+
+
+    const CANCEL_REASONS = [
+        "Quality not good",
+        "Delivery not on time",
+        "High price",
+        "Moving to another supplier",
+    ];
+
+
     const user = useAuth();
     const navigate = useNavigate();
 
@@ -25,6 +40,8 @@ function Profile() {
     const [showSchedule, setShowSchedule] = useState(false);
     const [orders, setOrders] = useState([]);
     const toast = useToast();
+    const [cancelModal, setCancelModal] = useState(EMPTY_CANCEL_MODAL);
+
 
 
 
@@ -40,7 +57,7 @@ function Profile() {
             const { data, error } = await supabase.from('profiles').select('*').order('created_at', { ascending: false });
             console.log({ data, error });
 
-            supabase.from('profiles').select('*').order('created_at', { ascending:false }).then(r => console.log("profiles select:", r));
+            supabase.from('profiles').select('*').order('created_at', { ascending: false }).then(r => console.log("profiles select:", r));
 
             setLoading(true);
             try {
@@ -76,22 +93,35 @@ function Profile() {
     }, [user, navigate]);
 
 
-    async function handleCancel(id) {
-        const confirmCancel = window.confirm("Are you sure you want to cancel this delivery?");
-        if (!confirmCancel) return;
-
+    async function handleCancel(subscriptionId, payload) {
         try {
-            await cancelSubscription(id);
+            const { data, error } = await supabase.functions.invoke(
+                "cancel-subscription",
+                {
+                    body: {
+                        subscription_id: subscriptionId,
+                        reasons: payload.reasons,
+                        other_reason: payload.other,
+                    },
+                }
+            );
 
-            // refresh subscriptions
+            if (error) {
+                console.error("Edge function error:", error);
+                throw error;
+            }
+
+            toast.success("Subscription cancelled. Confirmation email sent.");
+
             const subs = await getSubscriptionsForUser(user.id);
             setSubscriptions(subs);
-
         } catch (err) {
             console.error("Cancel error:", err);
             toast.error("Failed to cancel subscription");
         }
     }
+
+
 
     async function handleSave(e) {
         e?.preventDefault();
@@ -201,10 +231,10 @@ function Profile() {
                     <label className="label">Delivery address</label>
                     <textarea className="input input-area" value={profile.delivery_address} onChange={e => setProfile({ ...profile, delivery_address: e.target.value })} />
 
-                    <div className="form-actions">
+                    {/* <div className="form-actions">
                         <button className="primary" type="submit" disabled={saving}>{saving ? "Saving..." : "Save profile"}</button>
                         <button type="button" className="secondary" onClick={() => setShowSchedule(true)}>Schedule New Delivery</button>
-                    </div>
+                    </div> */}
                 </form>
             </div>
 
@@ -244,7 +274,7 @@ function Profile() {
                                         <div className="muted-value">{user.email}</div>
                                     </div>
 
-                                    <div className="sub-meta">
+                                    <div className="sub-meta flex-column align-end">
                                         <div className="muted-label">Schedule</div>
                                         <div className="muted-value">{scheduleText}</div>
 
@@ -253,7 +283,16 @@ function Profile() {
 
                                         <button
                                             className="secondary"
-                                            onClick={() => handleCancel(sub.id)}
+                                            onClick={() =>
+                                                setCancelModal({
+                                                    open: true,
+                                                    sub,
+                                                    reasons: [],
+                                                    other: "",
+                                                })
+                                            }
+
+
                                             style={{ marginTop: "10px" }}
                                         >
                                             Cancel Delivery
@@ -271,7 +310,7 @@ function Profile() {
             <div>
                 {orders.length === 0 ? (
                     <div className="empty">
-                        No orders yet. <button className="primary-btn-sm" onClick={() => navigate("/products")}>Shop now</button>
+                        No orders yet. <button className="primary" onClick={() => navigate("/products")}>Shop now</button>
                     </div>
                 ) : (
                     orders.map(order => (
@@ -318,15 +357,89 @@ function Profile() {
                     ))
                 )}
             </div>
-            <Modal open={showSchedule} onClose={() => setShowSchedule(false)}>
-                <ScheduleModal
-                    onClose={() => setShowSchedule(false)}
-                    onCreated={async () => {
-                        const subs = await getSubscriptionsForUser(user.id);
-                        setSubscriptions(subs);
-                    }}
-                />
+            <Modal
+                open={cancelModal.open}
+                onClose={() => setCancelModal(EMPTY_CANCEL_MODAL)}
+            >
+                {/* Guard: do not render if no subscription */}
+                {cancelModal.sub && (
+                    <>
+                        <h3 className="mb-1">Cancel Subscription</h3>
+
+                        <p className="text-light mb-1">
+                            Please tell us why you’re cancelling. This helps us improve.
+                        </p>
+
+                        {/* Checkboxes */}
+                        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                            {CANCEL_REASONS.map(reason => (
+                                <label key={reason} className="flex align-center gap-1">
+                                    <input
+                                        type="checkbox"
+                                        checked={cancelModal.reasons.includes(reason)}
+                                        onChange={e => {
+                                            const checked = e.target.checked;
+
+                                            setCancelModal(prev => ({
+                                                ...prev,
+                                                reasons: checked
+                                                    ? [...prev.reasons, reason]
+                                                    : prev.reasons.filter(r => r !== reason),
+                                            }));
+                                        }}
+                                    />
+                                    <span>{reason}</span>
+                                </label>
+                            ))}
+                        </div>
+
+                        {/* Other reason */}
+                        <div className="fieldset flex-column mt-05 mb-1">
+                            <label className="label mt-1">Other reason (optional)</label>
+                            <textarea
+                                className="input input-area"
+                                placeholder="Tell us more..."
+                                value={cancelModal.other}
+                                onChange={e =>
+                                    setCancelModal(prev => ({
+                                        ...prev,
+                                        other: e.target.value,
+                                    }))
+                                }
+                            />
+                        </div>
+
+                        {/* Actions */}
+                        <div className="form-actions justify-end">
+                            <button
+                                className="secondary"
+                                onClick={() => setCancelModal(EMPTY_CANCEL_MODAL)}
+                            >
+                                Keep subscription
+                            </button>
+
+                            <button
+                                className="primary cancel"
+                                disabled={
+                                    cancelModal.reasons.length === 0 &&
+                                    !cancelModal.other.trim()
+                                }
+                                onClick={async () => {
+                                    await handleCancel(cancelModal.sub.id, {
+                                        reasons: cancelModal.reasons,
+                                        other: cancelModal.other,
+                                    });
+
+                                    setCancelModal(EMPTY_CANCEL_MODAL);
+                                }}
+                            >
+                                Confirm cancel
+                            </button>
+                        </div>
+                    </>
+                )}
             </Modal>
+
         </div>
     )
 }

@@ -581,28 +581,29 @@ function SubscriptionsPanel() {
 
 function UsersPanel() {
   const toast = useToast();
+
   const [users, setUsers] = useState([]);
+  const [allUsers, setAllUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [toggling, setToggling] = useState(null);
+
+  // filters
+  const [roleFilter, setRoleFilter] = useState("all"); // all | admin | user
+  const [dateFilter, setDateFilter] = useState("");
+  const [search, setSearch] = useState("");
 
   async function load() {
     setLoading(true);
     try {
-      // fetch profiles (includes is_admin); also fetch email via auth.users view
       const { data, error } = await supabase
         .from("profiles")
         .select("id, full_name, phone, delivery_address, is_admin, email, created_at")
         .order("created_at", { ascending: false });
 
-      // fallback: if no user_email field, just return profile rows
-      if (error) {
-        console.warn("profiles fetch:", error);
-        const { data: d } = await supabase.from("profiles").select("*");
-        setUsers(d || []);
-      } else {
-        // supabase may not map email via alias; if user_email missing, keep as-is
-        setUsers(data || []);
-      }
+      if (error) throw error;
+
+      setAllUsers(data || []);
+      setUsers(data || []);
     } catch (e) {
       console.error(e);
       toast.error("Failed", "Could not load users");
@@ -611,7 +612,40 @@ function UsersPanel() {
     }
   }
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+  }, []);
+
+  // 🔍 filtering logic
+  useEffect(() => {
+    let filtered = [...allUsers];
+
+    // role filter
+    if (roleFilter !== "all") {
+      filtered = filtered.filter(u =>
+        roleFilter === "admin" ? u.is_admin : !u.is_admin
+      );
+    }
+
+    // joined date filter
+    if (dateFilter) {
+      filtered = filtered.filter(u =>
+        u.created_at?.startsWith(dateFilter)
+      );
+    }
+
+    // search (name / phone / email)
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      filtered = filtered.filter(u =>
+        u.full_name?.toLowerCase().includes(q) ||
+        u.phone?.includes(q) ||
+        u.email?.toLowerCase().includes(q)
+      );
+    }
+
+    setUsers(filtered);
+  }, [roleFilter, dateFilter, search, allUsers]);
 
   async function toggleAdmin(row) {
     setToggling(row.id);
@@ -624,7 +658,12 @@ function UsersPanel() {
         .single();
 
       if (error) throw error;
-      toast.success("Updated", `${row.full_name || row.id.slice(0, 8)} is ${data.is_admin ? "admin" : "user"}`);
+
+      toast.success(
+        "Updated",
+        `${row.full_name || row.id.slice(0, 8)} is now ${data.is_admin ? "admin" : "user"}`
+      );
+
       await load();
     } catch (e) {
       console.error(e);
@@ -634,16 +673,26 @@ function UsersPanel() {
     }
   }
 
+  const stats = {
+    total: allUsers.length,
+    admins: allUsers.filter(u => u.is_admin).length,
+    users: allUsers.filter(u => !u.is_admin).length,
+  };
+
   return (
     <div className="dashboard users">
       <h2 className="panel-title">Users</h2>
-      {loading ? <div className="empty">Loading users…</div> : (
+
+      {loading ? (
+        <div className="empty">Loading users…</div>
+      ) : (
         <>
+          {/* Stats */}
           <div className="cards-container">
             <div className="card flex space-btw align-center gap-1">
               <div className="text-wrapper">
                 <p className="text-light mb-1">Total</p>
-                <h3 className="bold text-primary">{users.length}</h3>
+                <h3 className="bold text-primary">{stats.total}</h3>
               </div>
               <div className="svg-wrapper square">
                 <LuTrendingUp size={24} className="icon-primary" />
@@ -652,59 +701,118 @@ function UsersPanel() {
 
             <div className="card flex space-btw align-center gap-1">
               <div className="text-wrapper">
-                <p className="text-light mb-1">Active</p>
-                <h3 className="bold text-primary">{users.length}</h3>
+                <p className="text-light mb-1">Admins</p>
+                <h3 className="bold text-success">{stats.admins}</h3>
               </div>
-              <div className="svg-wrapper square bg-error">
-                <LuCircleAlert size={24} className="text-error" />
+              <div className="svg-wrapper square bg-success">
+                <LuCircleCheckBig size={24} className="text-success" />
               </div>
             </div>
+
             <div className="card flex space-btw align-center gap-1">
               <div className="text-wrapper">
-                <p className="text-light mb-1">Weekly Change</p>
-                <h3 className="bold text-primary">+{users.length}</h3>
+                <p className="text-light mb-1">Users</p>
+                <h3 className="bold text-primary">{stats.users}</h3>
               </div>
               <div className="svg-wrapper square bg-error">
                 <LuCircleAlert size={24} className="text-error" />
               </div>
             </div>
           </div>
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>User</th>
-                <th>Phone</th>
-                <th>Address</th>
-                <th>Admin</th>
-                <th>Joined</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.map(u => (
-                <tr key={u.id}>
-                  <td>
-                    <div style={{ fontWeight: 700 }}>{u.full_name || <span className="mono">{u.id.slice(0, 8)}</span>}</div>
-                    <div className="muted mono">{u.user_email || u.email || "—"}</div>
-                  </td>
-                  <td>{u.phone || "—"}</td>
-                  <td style={{ maxWidth: 280 }}>{u.delivery_address || "—"}</td>
-                  <td>{u.is_admin ? "Yes" : "No"}</td>
-                  <td className="mono">{u.created_at ? new Date(u.created_at).toLocaleString() : "—"}</td>
-                  <td>
-                    <button className="primary sm" disabled={toggling === u.id} onClick={() => toggleAdmin(u)}>
-                      {toggling === u.id ? "Working…" : (u.is_admin ? "Revoke" : "Make admin")}
-                    </button>
-                  </td>
+
+          {/* Filters */}
+          <div className="filter-bar flex gap-1 mb-1">
+            <select
+              value={roleFilter}
+              onChange={e => setRoleFilter(e.target.value)}
+            >
+              <option value="all">All</option>
+              <option value="admin">Admins</option>
+              <option value="user">Users</option>
+            </select>
+
+            <input
+              type="date"
+              value={dateFilter}
+              onChange={e => setDateFilter(e.target.value)}
+            />
+
+            <input
+            className="flex-1"
+              type="text"
+              placeholder="Search name / phone / email"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+            />
+
+            {(roleFilter !== "all" || dateFilter || search) && (
+              <button
+                className="secondary sm"
+                onClick={() => {
+                  setRoleFilter("all");
+                  setDateFilter("");
+                  setSearch("");
+                }}
+              >
+                Clear
+              </button>
+            )}
+          </div>
+
+          {/* Table */}
+          {users.length === 0 ? (
+            <div className="empty">No users found</div>
+          ) : (
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>User</th>
+                  <th>Phone</th>
+                  <th>Address</th>
+                  <th>Admin</th>
+                  <th>Joined</th>
+                  <th>Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {users.map(u => (
+                  <tr key={u.id}>
+                    <td>
+                      <div className="bold">
+                        {u.full_name || <span className="mono">{u.id.slice(0, 8)}</span>}
+                      </div>
+                      <div className="muted mono">{u.email || "—"}</div>
+                    </td>
+                    <td>{u.phone || "—"}</td>
+                    <td style={{ maxWidth: 280 }}>{u.delivery_address || "—"}</td>
+                    <td>{u.is_admin ? "Yes" : "No"}</td>
+                    <td className="mono">
+                      {u.created_at ? new Date(u.created_at).toLocaleString() : "—"}
+                    </td>
+                    <td>
+                      <button
+                        className="primary sm"
+                        disabled={toggling === u.id}
+                        onClick={() => toggleAdmin(u)}
+                      >
+                        {toggling === u.id
+                          ? "Working…"
+                          : u.is_admin
+                            ? "Revoke"
+                            : "Make admin"}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </>
       )}
     </div>
   );
 }
+
 
 /* ---------- Products (simple) ---------- */
 
