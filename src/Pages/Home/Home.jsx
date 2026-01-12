@@ -1,13 +1,4 @@
 
-import HERO from '../../assets/hero.webp'
-import HERO1 from '../../assets/gallery/WA00018.jpeg'
-import HERO2 from '../../assets/gallery/WA00019.jpeg'
-import HERO3 from '../../assets/gallery/WA00017.jpeg'
-import HERO4 from '../../assets/gallery/WA00016.jpg'
-import HERO5 from '../../assets/gallery/WA00015.jpg'
-import HERO6 from '../../assets/gallery/WA00014.jpg'
-import HERO7 from '../../assets/gallery/WA00013.jpg'
-import HERO8 from '../../assets/gallery/WA00012.jpg'
 import './home.css'
 import MILK from '../../assets/milk.webp'
 import GHEE from '../../assets/ghee.webp'
@@ -20,14 +11,13 @@ function Home() {
 
     const navigate = useNavigate();
     const heroImages = [
-        HERO1,
-        HERO3,
-        HERO2,
-        HERO4,
-        HERO5,
-        HERO6,
-        HERO7,
-        HERO8,
+        "https://vrygzawhgoqnaabqsoll.supabase.co/storage/v1/object/public/Gallery/WA0012.jpg",
+        "https://vrygzawhgoqnaabqsoll.supabase.co/storage/v1/object/public/Gallery/WA0013.webp",
+        "https://vrygzawhgoqnaabqsoll.supabase.co/storage/v1/object/public/Gallery/WA0014.webp",
+        "https://vrygzawhgoqnaabqsoll.supabase.co/storage/v1/object/public/Gallery/WA0015.webp",
+        "https://vrygzawhgoqnaabqsoll.supabase.co/storage/v1/object/public/Gallery/WA0016.webp",
+        "https://vrygzawhgoqnaabqsoll.supabase.co/storage/v1/object/public/Gallery/WA0017.webp",
+        "https://vrygzawhgoqnaabqsoll.supabase.co/storage/v1/object/public/Gallery/WA0018.jpeg",
     ];
 
     const [activeIdx, setActiveIdx] = useState(0);
@@ -63,6 +53,8 @@ function Home() {
                             src={img}
                             alt="farm"
                             className={`hero-image ${idx === activeIdx ? "active" : ""}`}
+                            loading="eager"
+                            decoding="async"
                         />
                     ))}
                 </div>

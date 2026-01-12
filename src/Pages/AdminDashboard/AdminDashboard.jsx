@@ -445,7 +445,16 @@ function SubscriptionsPanel() {
               const nextDate = s.next_delivery_date ? formatDateOnly(s.next_delivery_date) : "—";
               return (
                 <tr key={s.id}>
-                  <td className="mono">{s.id.slice(0, 8)}</td>
+                  <td>
+                    <div>
+                      <strong>{s.profiles?.full_name || "Unknown user"}</strong>
+                      <div className="muted">
+                        {s.profiles?.phone || s.profiles?.email}
+                      </div>
+                    </div>
+                  </td>
+
+
                   <td style={{ maxWidth: 320 }}>{s.product_name}</td>
                   <td style={{ maxWidth: 280 }}>{scheduleText}</td>
                   <td className="mono">{nextDate}</td>

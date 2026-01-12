@@ -18,11 +18,17 @@
 @media screen and (max-width: 1024px) {
     .main-container.gallery {
         .gallery-container {
-            grid-template-columns: repeat(1, minmax(0, 1fr));
+            grid-template-columns: repeat(2, minmax(0, 1fr));
         }
     }
 }
 
 
 /*======== MEDIA QUERIES (SMALL DEVICES) ======== */
-@media screen and (max-width: 768px) {}
+@media screen and (max-width: 768px) {
+    .main-container.gallery {
+        .gallery-container {
+            grid-template-columns: repeat(1, minmax(0, 1fr));
+        }
+    }
+}

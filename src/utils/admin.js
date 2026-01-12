@@ -69,7 +69,8 @@ export async function adminGetAllSubscriptions() {
       created_at,
       profiles (
         full_name,
-        phone
+        phone,
+        email
       )
     `)
     .order("created_at", { ascending: false });
@@ -77,6 +78,7 @@ export async function adminGetAllSubscriptions() {
   if (error) throw error;
   return data || [];
 }
+
 
 export async function adminCancelSubscription(subscriptionId) {
   const { data, error } = await supabase

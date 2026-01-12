@@ -121,7 +121,7 @@ function Contact() {
 
                         <div className="form-field">
                             <label htmlFor="org">Organization</label>
-                            <input name="org" id="org" type="text" placeholder="Hospital/Clinic Name" />
+                            <input name="org" id="org" type="text" placeholder="Company name" />
                         </div>
 
                         <div className="form-field">
